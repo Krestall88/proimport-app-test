@@ -1,0 +1,5 @@
+ALTER TABLE public.goods_receipt_items
+ADD COLUMN IF NOT EXISTS batch_number TEXT,
+ADD COLUMN IF NOT EXISTS expiry_date DATE,
+ADD COLUMN IF NOT EXISTS storage_location TEXT,
+ADD COLUMN IF NOT EXISTS notes TEXT;

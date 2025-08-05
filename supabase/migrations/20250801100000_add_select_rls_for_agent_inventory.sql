@@ -1,0 +1,1 @@
+-- This migration has been superseded by 20250801101000_fix_inventory_rpc_and_rls.sql and is intentionally left empty.

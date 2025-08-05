@@ -1,0 +1,23 @@
+.warehouse-dashboard {
+  @apply p-4;
+}
+
+.warehouse-tabs {
+  @apply space-y-4;
+}
+
+.warehouse-card {
+  @apply rounded-lg shadow-sm transition-all hover:shadow-md;
+}
+
+.warehouse-table {
+  @apply w-full;
+}
+
+.warehouse-cell {
+  @apply px-2 py-2;
+}
+
+.warehouse-header {
+  @apply bg-muted/50;
+}

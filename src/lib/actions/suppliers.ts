@@ -67,7 +67,7 @@ export async function deleteSupplier(id: string) {
 }
 
 export async function getSuppliers(searchTerm?: string): Promise<SupplierInfo[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
   let query = supabase
     .from('suppliers')
     .select('id, name, contacts, tin, kpp, delivery_address, payment_terms')

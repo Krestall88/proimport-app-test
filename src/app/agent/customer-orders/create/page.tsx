@@ -9,7 +9,7 @@ export default async function CreateCustomerOrderPage() {
 
   // Using the dedicated RPC function to get available inventory
   const { data: rpcData, error } = await supabase.rpc(
-    'get_inventory_with_reservations' as string
+    'get_inventory_with_reservations'
   );
 
   // The RPC function returns data that is already in the InventoryProduct shape.
@@ -29,7 +29,7 @@ export default async function CreateCustomerOrderPage() {
   // The data from RPC is already in the correct shape.
   const inventory: InventoryProduct[] = (inventoryData as any[]).map(item => ({
   ...item,
-  unit: item.unit === null ? undefined : item.unit,
+  unit: item.unit ?? undefined,
 }));
 
   return (

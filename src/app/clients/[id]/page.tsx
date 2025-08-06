@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import ClientDetail from './ClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+export default async function (props: any) {
+  const { params } = props;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

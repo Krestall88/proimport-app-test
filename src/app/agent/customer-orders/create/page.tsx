@@ -9,7 +9,7 @@ export default async function CreateCustomerOrderPage() {
 
   // Using the dedicated RPC function to get available inventory
   const { data: rpcData, error } = await supabase.rpc(
-    'get_available_inventory_for_agent'
+    'get_inventory_with_reservations'
   );
 
   // The RPC function returns data that is already in the InventoryProduct shape.
@@ -27,7 +27,10 @@ export default async function CreateCustomerOrderPage() {
   }
 
   // The data from RPC is already in the correct shape.
-  const inventory: InventoryProduct[] = inventoryData;
+  const inventory: InventoryProduct[] = (inventoryData as any[]).map(item => ({
+  ...item,
+  unit: item.unit === null ? undefined : item.unit,
+}));
 
   return (
     <div className="container mx-auto p-4">

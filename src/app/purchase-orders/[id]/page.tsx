@@ -8,7 +8,8 @@ import { PurchaseOrderDetail, PurchaseOrderStatus } from '@/lib/types';
 import { formatCurrency } from '@/app/utils/formatCurrency';
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-export default async function PurchaseOrderDetailPage({ params }: { params: { id: string } }) {
+export default async function (props: any) {
+  const { params } = props;
   const supabase = createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

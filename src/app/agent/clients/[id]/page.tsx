@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import AgentClientDetail from './AgentClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function (props: any) {
+export default async function (props) {
   const { params } = props;
   const supabase = await createClient();
 

@@ -7,7 +7,8 @@ import ReceivingForm from './ReceivingForm'; // Import the new component
 // Это серверный компонент, который загружает данные для конкретного заказа на закупку
 // и отображает интерактивную форму для приёмки товаров.
 
-export default async function ReceivingPage({ params }: { params: { id: string } }) {
+export default async function (props: any) {
+  const { params } = props;
   // Получаем ID из параметров маршрута
   const orderId = params?.id;
 

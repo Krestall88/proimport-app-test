@@ -764,6 +764,20 @@ export type Database = {
       }
     }
     Functions: {
+      get_inventory_with_reservations: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          product_id: string;
+          name: string;
+          sku: string;
+          available_quantity: number;
+          expiry_date?: string | null;
+          description?: string | null;
+          batch_number?: string;
+          unit?: string | null;
+          final_price: number;
+        }[];
+      };
       get_analytics_kpis: {
         Args: Record<PropertyKey, never>
         Returns: {

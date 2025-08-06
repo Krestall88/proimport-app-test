@@ -4,11 +4,10 @@ import ClientDetail from './ClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
 interface PageProps {
-  params: { id: string } | Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default async function Page({ params }: PageProps) {
-  const resolvedParams = await (params instanceof Promise ? params : Promise.resolve(params));
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -23,7 +22,7 @@ export default async function Page({ params }: PageProps) {
     .eq('id', user.id)
     .single();
 
-  const client = await getClientById(resolvedParams.id);
+  const client = await getClientById(params.id);
   
   if (!client) {
     return notFound();

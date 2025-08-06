@@ -3,8 +3,12 @@ import { notFound } from 'next/navigation';
 import ClientDetail from './ClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function(props) {
-  const { params } = props;
+interface PageProps {
+  params: { id: string } | Promise<{ id: string }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const resolvedParams = await (params instanceof Promise ? params : Promise.resolve(params));
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +23,7 @@ export default async function(props) {
     .eq('id', user.id)
     .single();
 
-  const client = await getClientById(params.id);
+  const client = await getClientById(resolvedParams.id);
   
   if (!client) {
     return notFound();

@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getCustomers } from './actions';
 
-export default async function ClientsPage({ searchParams }: { searchParams: { search?: string } }) {
+export default async function (props: any) {
+  const { searchParams } = props;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

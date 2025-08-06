@@ -9,7 +9,7 @@ export default async function CreateCustomerOrderPage() {
 
   // Using the dedicated RPC function to get available inventory
   const { data: rpcData, error } = await supabase.rpc(
-    'get_inventory_with_reservations'
+    'get_inventory_with_reservations' as string
   );
 
   // The RPC function returns data that is already in the InventoryProduct shape.

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { updateOrderStatus, uploadDeliveryPhoto } from './actions';
-import { createInvoice } from '@/app/invoices/actions';
+
 import StatusBadge from '@/components/StatusBadge';
 
 import { formatCurrency } from '@/app/utils/formatCurrency';
@@ -181,20 +181,13 @@ export default async function CustomerOrderDetailPage({ params }: { params: { id
         )}
 
         {canCreateInvoice && (
-          <div className="mt-8 border-t border-gray-700 pt-6">
-            <h3 className="font-semibold text-lg mb-4">Действия бухгалтера</h3>
-            <form action={createInvoice}>
-              <input type="hidden" name="orderId" value={order.id} />
-              <input type="hidden" name="totalAmount" value={totalCost} />
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-base"
-              >
-                Создать счет-фактуру
-              </button>
-            </form>
-          </div>
-        )}
+  <div className="mt-8 border-t border-gray-700 pt-6">
+    <h3 className="font-semibold text-lg mb-4">Действия бухгалтера</h3>
+    <div className="p-4 bg-yellow-900 text-yellow-200 rounded">
+      Создание счета временно недоступно (таблица invoices отсутствует).
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

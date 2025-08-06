@@ -68,7 +68,24 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
 
     async function loadCustomers() {
       const { data: cust } = await supabase.from("customers").select("id, name, contacts, tin, kpp, delivery_address, payment_terms");
-      setCustomers(cust || []);
+      if (cust) {
+        // Ensure contacts is object or null, never a string
+        setCustomers(
+          cust.map((c) => ({
+            ...c,
+            contacts:
+              typeof c.contacts === 'string'
+                ? (() => { try { return JSON.parse(c.contacts); } catch { return null; } })()
+                : (c.contacts ?? null),
+            tin: c.tin === null ? undefined : c.tin,
+            kpp: c.kpp === null ? undefined : c.kpp,
+            delivery_address: c.delivery_address === null ? undefined : c.delivery_address,
+            payment_terms: c.payment_terms === null ? undefined : c.payment_terms,
+          }))
+        );
+      } else {
+        setCustomers([]);
+      }
     }
 
     loadCustomers();

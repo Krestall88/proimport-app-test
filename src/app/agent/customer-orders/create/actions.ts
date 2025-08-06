@@ -136,7 +136,7 @@ export async function createCustomerWishlist(formData: FormData): Promise<{ succ
     if (!user) return { success: false, message: 'Пользователь не авторизован.' };
 
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    if (!['agent', 'owner'].includes(profile?.role)) return { success: false, message: 'У вас нет прав для этого действия.' };
+    if (!profile?.role || !['agent', 'owner'].includes(profile.role)) return { success: false, message: 'У вас нет прав для этого действия.' };
 
     const customerId = formData.get('customer') as string;
     const wishlistJson = formData.get('wishlist') as string;

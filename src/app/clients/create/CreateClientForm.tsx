@@ -55,7 +55,7 @@ export async function createClientAction(formData: FormData) {
   redirect('/clients');
 }
 
-export function CreateClientForm() {
+export async function CreateClientForm() {
   return (
     <form action={createClientAction} className="space-y-4">
       <input name="name" placeholder="Имя клиента" required className="input" />

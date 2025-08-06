@@ -21,7 +21,7 @@ interface InventoryProduct {
   expiry_date?: string | null;
   description?: string | null;
   batch_number?: string;
-  unit?: string;
+  unit?: string | null;
   category?: string;
 }
 

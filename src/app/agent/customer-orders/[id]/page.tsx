@@ -38,7 +38,8 @@ interface Agent {
   full_name: string;
 }
 
-export default async function CustomerOrderDetailPage({ params }: { params: { id: string } }) {
+export default async function (props: any) {
+  const { params } = props;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

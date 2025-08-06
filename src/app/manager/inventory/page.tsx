@@ -7,12 +7,7 @@ export default async function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold tracking-tight">Остатки на складе</h3>
-        <p className="text-sm text-muted-foreground">
-          Просмотр текущих остатков товаров на складе.
-        </p>
-      </div>
+      
       <InventoryTable inventory={inventory} />
     </div>
   );

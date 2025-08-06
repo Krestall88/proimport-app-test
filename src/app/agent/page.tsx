@@ -1,5 +1,10 @@
 import AgentDashboard from '@/components/dashboards/AgentDashboard';
 
-export default function AgentHome() {
-  return <AgentDashboard />;
+import { createClient } from '@/lib/supabase/server';
+
+export default async function AgentHome() {
+
+  const supabase = await createClient();
+  // Передаём supabase клиент в AgentDashboard, если потребуется
+  return <AgentDashboard supabase={supabase} />;
 }

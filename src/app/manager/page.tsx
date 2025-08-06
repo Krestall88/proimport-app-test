@@ -31,7 +31,7 @@ export default function ManagerProductsPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Общий список товаров</h1>
+        
         <CreateProductModal onProductCreated={handleProductCreated} />
       </div>
       <ProductTable products={products} onProductsChange={setProducts} role="owner" />

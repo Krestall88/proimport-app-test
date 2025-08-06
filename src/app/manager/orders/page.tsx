@@ -45,12 +45,7 @@ export default function CustomerOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold tracking-tight">Заказы клиентов</h3>
-        <p className="text-sm text-muted-foreground">
-          Список всех заказов от клиентов. Можно фильтровать по поставщику и дате.
-        </p>
-      </div>
+      
       <div className="flex flex-wrap gap-4 items-end">
         <div>
           <label className="block text-xs mb-1">Клиент</label>

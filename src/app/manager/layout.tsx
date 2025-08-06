@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AppShell } from '@/components/shell';
 import { createClient } from '@/lib/supabase/server';
+
 import { redirect } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -29,6 +30,7 @@ const navLinks = [
 ];
 
 export default async function ManagerLayout({ children }: ManagerLayoutProps) {
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

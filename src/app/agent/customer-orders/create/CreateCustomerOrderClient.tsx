@@ -227,12 +227,12 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="p-4 w-full space-y-8">
       <h1 className="text-2xl font-bold mb-6 text-center">Создание нового заказа клиента</h1>
       
       {/* Выбор клиента в левом углу */}
       <div className="mb-6">
-        <div className="max-w-md">
+        <div className="w-full max-w-lg">
           <h2 className="text-lg font-semibold mb-3">Выбор клиента</h2>
           <Select onValueChange={setSelectedCustomerId} value={selectedCustomerId || ''}>
             <SelectTrigger>
@@ -253,14 +253,14 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
 
       {/* Остатки товаров */}
       <div className="mb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full">
           <h2 className="text-xl font-semibold mb-4">Остатки товаров</h2>
           <div className="mb-4">
             <Input
               placeholder="Поиск товаров..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full max-w-md"
+              className="w-full"
             />
           </div>
           <div className="border rounded-lg overflow-x-auto">
@@ -288,14 +288,15 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
                     <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : '-'}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>
                     <TableCell className="text-right">{product.available_quantity} {product.unit}</TableCell>
-                    <TableCell className="w-[100px]">
+                    <TableCell className="min-w-[120px]">
                       <Input
                         type="number"
                         min="1"
                         max={product.available_quantity}
                         value={qtyById[product.product_id] || 1}
                         onChange={(e) => setQtyById({ ...qtyById, [product.product_id]: parseInt(e.target.value, 10) })}
-                        className="w-full"
+                        className="w-32"
+                        style={{ minWidth: 120 }}
                         disabled={product.available_quantity <= 0}
                       />
                     </TableCell>
@@ -317,64 +318,61 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       </div>
 
       {/* Корзина под остатками */}
-      <div className="max-w-4xl mx-auto">
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4">Корзина</h3>
-          {cart.length === 0 ? (
-            <div className="border-2 border-dashed rounded-lg p-8 text-center text-muted-foreground">
-              <p>Корзина пуста</p>
-            </div>
-          ) : (
-            <div className="border rounded-lg overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Наименование</TableHead>
-                    <TableHead className="text-right">Количество</TableHead>
-                    <TableHead className="text-right">Цена</TableHead>
-                    <TableHead className="text-right">Итого</TableHead>
-                    <TableHead className="text-center">Действия</TableHead>
+      <div className="w-full mt-8">
+        <h3 className="text-lg font-semibold mb-4">Корзина</h3>
+        {cart.length === 0 ? (
+          <div className="border-2 border-dashed rounded-lg p-8 text-center text-muted-foreground">
+            <p>Корзина пуста</p>
+          </div>
+        ) : (
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Наименование</TableHead>
+                  <TableHead className="text-right">Количество</TableHead>
+                  <TableHead className="text-right">Цена</TableHead>
+                  <TableHead className="text-right">Итого</TableHead>
+                  <TableHead className="text-center">Действия</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cart.map((item) => (
+                  <TableRow key={item.product_id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="text-right">{item.quantity} {item.unit}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.final_price * item.quantity)}</TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="destructive" size="sm" onClick={() => handleRemoveFromCart(item.product_id)}>Удалить</Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {cart.map((item) => (
-                    <TableRow key={item.product_id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="text-right">{item.quantity} {item.unit}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.final_price * item.quantity)}</TableCell>
-                      <TableCell className="text-center">
-                        <Button variant="destructive" size="sm" onClick={() => handleRemoveFromCart(item.product_id)}>Удалить</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        {cart.length > 0 && (
+          <div>
+            <div className="pt-4 mt-4 border-t">
+              <div className="flex justify-between font-bold">
+                <span>Итого</span>
+                <span>{formatCurrency(cart.reduce((acc, item) => acc + item.final_price * item.quantity, 0))}</span>
+              </div>
             </div>
-          )}
-          {cart.length > 0 && (
-            <>
-              <div className="pt-4 mt-4 border-t">
-                <div className="flex justify-between font-bold">
-                  <span>Итого</span>
-                  <span>{formatCurrency(cart.reduce((acc, item) => acc + item.final_price * item.quantity, 0))}</span>
-                </div>
-              </div>
-              <div className="flex justify-end mt-6">
-                <Button
-                  onClick={handleCreateOrder}
-                  disabled={!selectedCustomerId || cart.length === 0 || isPending}
-                >
-                  {isPending ? "Создание..." : "Создать заказ"}
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
+            <div className="flex justify-end mt-6">
+              <Button
+                onClick={handleCreateOrder}
+                disabled={!selectedCustomerId || cart.length === 0 || isPending}
+              >
+                {isPending ? "Создание..." : "Создать заказ"}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Хотелки под корзиной */}
-      <div className="max-w-4xl mx-auto mt-6">
+      <div className="w-full mt-6">
+        {/* Хотелки под корзиной */}
         <WishlistSection
           disabled={!selectedCustomerId}
           onWishlistChange={handleWishlistChange}

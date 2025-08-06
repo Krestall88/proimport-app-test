@@ -6,6 +6,7 @@ import { AppShell } from '@/components/shell';
 import WarehouseOrderBadge from './components/WarehouseOrderBadge';
 
 import { createClient } from '@/lib/supabase/server';
+
 import { User } from '@supabase/supabase-js';
 
 interface WarehouseLayoutProps {
@@ -28,6 +29,7 @@ const warehouseModule = {
 };
 
 export default async function WarehouseLayout({ children }: WarehouseLayoutProps) {
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -41,7 +43,7 @@ export default async function WarehouseLayout({ children }: WarehouseLayoutProps
     .eq('id', user.id)
     .single();
 
-  // Доступ только для кладовщика или владельца
+  // Доступ только для кладовщика или владельца (owner всегда допускается)
   if (profile?.role !== 'warehouse_manager' && profile?.role !== 'owner') {
     return redirect('/login?message=Access Denied');
   }

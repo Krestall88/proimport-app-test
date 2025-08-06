@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AppShell } from '@/components/shell';
 import { createClient } from '@/lib/supabase/server';
+
 import { redirect } from 'next/navigation';
 import { Truck, ListChecks } from 'lucide-react';
 
@@ -10,6 +11,7 @@ const navLinks = [
 ];
 
 export default async function DriverLayout({ children }: { children: React.ReactNode }) {
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

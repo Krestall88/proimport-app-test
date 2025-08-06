@@ -3,7 +3,10 @@ import { notFound } from 'next/navigation';
 import ClientsPageClient from './page-client';
 import { Customer } from '@/lib/types';
 
+
+
 export default async function ClientsPage() {
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

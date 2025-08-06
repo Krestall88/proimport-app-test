@@ -1,5 +1,6 @@
 'use server';
 
+
 import { createClient } from '@/lib/supabase/server';
 
 export interface InventoryItem {
@@ -24,6 +25,7 @@ export interface InventoryItem {
  * This function provides real-time inventory data for all roles (agent, warehouse, manager)
  */
 export async function getInventoryWithReservations(): Promise<InventoryItem[]> {
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('get_inventory_with_reservations');

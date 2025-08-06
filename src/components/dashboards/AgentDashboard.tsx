@@ -7,8 +7,15 @@ import { Button } from '@/components/ui/button';
 
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU');
 
-export default async function AgentDashboard() {
-  const supabase = await createClient();
+interface AgentDashboardProps {
+  supabase?: ReturnType<typeof createClient>;
+}
+
+export default async function AgentDashboard(props: AgentDashboardProps = {}) {
+  const supabase = props.supabase || (await (async () => {
+    const supabase = await createClient();
+    return supabase;
+  })());
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 

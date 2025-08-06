@@ -58,8 +58,10 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
  * Fetches customer orders for the dashboard.
  * Note: Uses 'any' for return type, should be replaced with a proper type.
  */
-export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
-  const supabase = await createClient();
+
+
+export async function getCustomerOrders(cookies?: any): Promise<WarehouseOrderItem[]> {
+  const supabase = await createClient(cookies);
 
   const { data, error } = await supabase
     .from('warehouse_orders_view')

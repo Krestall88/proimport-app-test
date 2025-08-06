@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
+
 import { notFound } from 'next/navigation';
-import CreateClientForm from '@/app/clients/create/CreateClientForm';
+import { CreateClientForm } from '@/app/clients/create/CreateClientForm';
 
 export default async function ManagerCreateClientPage() {
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

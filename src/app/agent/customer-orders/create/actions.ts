@@ -2,12 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+
 import { createClient } from '@/lib/supabase/server';
 
 export async function createCustomerOrders(data: { customerId: string; cart: any[]; wishlist: any[] }): Promise<{ success: boolean; message: string; orderId?: string; }> {
   'use server';
   console.log('--- SERVER ACTION: createCustomerOrders ---');
   console.log('Received data:', JSON.stringify(data, null, 2));
+
   const supabase = await createClient();
 
   try {

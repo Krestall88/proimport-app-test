@@ -1,3 +1,4 @@
+
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import React from 'react';
@@ -110,6 +111,7 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
 };
 
 export default async function CustomerOrdersPage() {
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -149,7 +151,7 @@ export default async function CustomerOrdersPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Ваши заказы</h1>
+        
         <Link href="/agent/customer-orders/create" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Создать новый заказ
         </Link>

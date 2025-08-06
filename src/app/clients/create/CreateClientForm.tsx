@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import React from 'react';
+
 export async function createClientAction(formData: FormData) {
   const supabase = await createClient();
 
@@ -38,7 +40,7 @@ export async function createClientAction(formData: FormData) {
     payment_terms: formData.get('payment_terms') as string || null,
     contacts: contacts,
     comments: formData.get('comments') as string || null,
-    user_id: user.id, // Привязываем клиента к пользователю
+    created_by: user.id,
   };
 
   const { error } = await supabase.from('customers').insert([rawFormData]);
@@ -51,4 +53,21 @@ export async function createClientAction(formData: FormData) {
   revalidatePath('/agent/clients');
   revalidatePath('/manager/clients');
   redirect('/clients');
+}
+
+export function CreateClientForm() {
+  return (
+    <form action={createClientAction} className="space-y-4">
+      <input name="name" placeholder="Имя клиента" required className="input" />
+      <input name="tin" placeholder="ИНН" className="input" />
+      <input name="kpp" placeholder="КПП" className="input" />
+      <input name="address" placeholder="Юридический адрес" className="input" />
+      <input name="delivery_address" placeholder="Адрес доставки" className="input" />
+      <input name="payment_terms" placeholder="Условия оплаты" className="input" />
+      <input name="contacts.phone" placeholder="Телефон" className="input" />
+      <input name="contacts.email" placeholder="Email" className="input" />
+      <textarea name="comments" placeholder="Комментарий" className="input" />
+      <button type="submit" className="btn btn-primary">Создать клиента</button>
+    </form>
+  );
 }

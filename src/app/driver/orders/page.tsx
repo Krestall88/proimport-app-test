@@ -8,10 +8,10 @@ export default async function DriverOrdersPage() {
 
   return (
     <main className="main-content flex-1 p-6 md:p-10 bg-background min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold mb-8">Заказы для отгрузки</h1>
-        <div className="overflow-x-auto rounded-lg shadow bg-card">
-          <table className="min-w-full divide-y divide-gray-700">
+      <div className="w-full">
+        
+        <div className="w-full overflow-x-auto rounded-lg shadow bg-card">
+          <table className="w-full min-w-[900px] divide-y divide-gray-700">
             <thead className="bg-muted">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Клиент</th>
@@ -31,7 +31,11 @@ export default async function DriverOrdersPage() {
                   <td className="px-4 py-3 whitespace-nowrap">{order.customer_address}</td>
                   <td className="px-4 py-3 whitespace-nowrap">{order.created_at}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className="inline-block rounded px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold">Готов к отгрузке</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-center">{order.items_count}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-center">{
+  Array.isArray(order.items_count)
+    ? (order.items_count[0]?.count ?? order.items_count.length ?? 0)
+    : order.items_count ?? 0
+}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <form action={confirmShippedAction.bind(null, order.id)}>
                       <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded transition-colors">Подтвердить отгрузку</button>

@@ -18,11 +18,13 @@ interface SupplierInfo {
   payment_terms?: string;
 }
 
-import { createClient } from '@/lib/supabase/server'; // Оставляем, т.к. это серверный компонент
+import { createClient } from '@/lib/supabase/server';
+
 import SupplierTableClient from './SupplierTableClient';
 
 export default async function ManagerSuppliersPage() {
-  const supabase = createClient();
+
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();

@@ -23,11 +23,10 @@ export function useWarehouseOrders() {
       }
     }
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
     return () => {
       active = false;
-      clearInterval(interval);
     };
+
   }, []);
 
   return { orders, isLoading, error };

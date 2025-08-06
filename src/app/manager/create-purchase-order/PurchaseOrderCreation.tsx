@@ -168,7 +168,7 @@ export default function PurchaseOrderCreation() {
       {/* Top Section: Product Selection */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Создание заказа на поставку</h1>
+          
           <CreateProductModal onProductCreated={handleProductCreated} />
         </div>
         <div className="border rounded-lg">
@@ -183,7 +183,7 @@ export default function PurchaseOrderCreation() {
 
       {/* Bottom Section: Cart and Supplier */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">Корзина заказа</h2>
+        
         <div className="flex items-start space-x-4">
           <div className="flex-grow border rounded-lg">
             <Table>

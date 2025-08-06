@@ -20,7 +20,7 @@ export default async function CreateCustomerOrderPage() {
     console.error("Error fetching inventory:", error);
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Создание нового заказа клиента</h1>
+        
         <p className="text-red-500">Не удалось загрузить остатки. Попробуйте позже.</p>
       </div>
     );
@@ -31,7 +31,7 @@ export default async function CreateCustomerOrderPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Создание нового заказа клиента</h1>
+      
       <CreateCustomerOrderClient inventory={inventory} />
     </div>
   );

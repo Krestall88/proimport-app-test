@@ -155,33 +155,6 @@ export async function deleteClient(id: string) {
     return { success: false, message: `Невозможно удалить клиента: найдено ${wishlist.length} записей в хотелках` };
   }
 
-  // 3. Проверяем связанные записи в других таблицах, если они есть
-  const tablesToCheck = [
-    { table: 'invoices', foreignKey: 'customer_id', name: 'счетов' },
-    { table: 'delivery_notes', foreignKey: 'customer_id', name: 'накладных' }
-  ];
-
-  for (const { table, foreignKey, name } of tablesToCheck) {
-    try {
-      const { data, error } = await supabase
-        .from(table)
-        .select('id')
-        .eq(foreignKey, id);
-
-      if (error) {
-        console.warn(`Error checking ${table}:`, error);
-        continue; // Продолжаем проверку других таблиц
-      }
-
-      if (data && data.length > 0) {
-        console.log(`Found ${data.length} ${table} for client`);
-        return { success: false, message: `Невозможно удалить клиента: найдено ${data.length} ${name}` };
-      }
-    } catch (error) {
-      console.warn(`Table ${table} might not exist or have different structure:`, error);
-    }
-  }
-
   // Удаляем клиента
   const { error } = await supabase
     .from('customers')

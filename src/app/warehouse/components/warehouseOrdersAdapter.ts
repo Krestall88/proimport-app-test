@@ -1,4 +1,4 @@
-import type { WarehouseOrderItem } from './WarehouseOrdersTable';
+import type { WarehouseOrderItem } from '@/lib/types';
 
 export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseOrderItem[] {
   // Если массив уже плоский (warehouse_orders_view), просто возвращаем его как есть

@@ -3,13 +3,7 @@ import { notFound } from 'next/navigation';
 import AgentClientDetail from './AgentClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
-
-const Page = async ({ params }: PageProps) => {
+export default async function Page({ params }: { params: { id: string } }) {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

@@ -209,6 +209,38 @@ export interface PurchaseOrderDetails extends PurchaseOrder {
   purchase_order_items: PurchaseOrderItemDetails[];
 };
 
+// --- Types for Warehouse Orders ---
+
+export interface WarehouseOrderItem {
+  order_id: string;
+  created_at: string;
+  shipped_at?: string | null;
+  status: string;
+  customer_name: string;
+  customer: {
+    name: string;
+    contacts: {
+      phone?: string | null;
+      email?: string | null;
+    } | null;
+    tin?: string;
+    kpp?: string;
+    delivery_address?: string;
+    payment_terms?: string;
+  } | null;
+  order_item_id: string;
+  product_title: string;
+  description?: string | null;
+  sku?: string;
+  category?: string;
+  expiry_date?: string | null;
+  batch_number?: string | null;
+  quantity: number;
+  unit?: string | null;
+  price_per_unit?: number;
+  final_price?: number;
+}
+
 //==============================================================================
 // Manager Module Types
 //==============================================================================

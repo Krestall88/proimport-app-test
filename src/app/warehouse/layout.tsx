@@ -54,6 +54,7 @@ export default async function WarehouseLayout({ children }: WarehouseLayoutProps
     href: item.href,
     label: item.title,
     icon: item.icon,
+    notificationBadgeCount: undefined,
   }));
 
 

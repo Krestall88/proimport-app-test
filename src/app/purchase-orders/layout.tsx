@@ -31,11 +31,20 @@ const sidebarNavItems = [
 ];
 
 export default function PurchaseOrdersLayout({ children }: PurchaseOrdersLayoutProps) {
+  // Convert sidebarNavItems to the format expected by AppShell
+  const navLinks = sidebarNavItems.map(item => ({
+    href: item.href,
+    label: item.title,
+    icon: item.icon,
+    notificationBadgeCount: undefined,
+  }));
+
   return (
     <AppShell
-      mainNavItems={mainNavItems}
-      sidebarNavItems={sidebarNavItems}
-      activeModule="Закупки"
+      user={null}
+      navLinks={navLinks}
+      title="Закупки"
+      role="owner"
     >
       {children}
     </AppShell>

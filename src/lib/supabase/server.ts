@@ -19,19 +19,17 @@ export async function createClient(customCookies?: any) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: cookies
-        ? {
-            get(name: string) {
-              return cookies.get(name)?.value;
-            },
-            set(name: string, value: string, options: CookieOptions) {
-              cookies.set({ name, value, ...options });
-            },
-            remove(name: string, options: CookieOptions) {
-              cookies.set({ name, value: '', ...options });
-            },
-          }
-        : undefined,
+      cookies: {
+        get(name: string) {
+          return cookies?.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          cookies?.set({ name, value, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          cookies?.set({ name, value: '', ...options });
+        },
+      },
     }
   );
 }

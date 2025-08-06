@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+// NOTE: The 'invoices' table does not exist in the current database schema
+// This code is commented out until the table is created
+/*
 export async function createInvoice(formData: FormData) {
   const supabase = await createClient();
 
@@ -59,3 +62,4 @@ export async function createInvoice(formData: FormData) {
     redirect(`/agent/customer-orders/${orderId}?message=Счет создан, но не удалось получить ID.&type=warning`);
   }
 }
+*/

@@ -60,8 +60,8 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
  */
 
 
-export async function getCustomerOrders(cookies?: any): Promise<WarehouseOrderItem[]> {
-  const supabase = await createClient(cookies);
+export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('warehouse_orders_view')

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/server';
+import { Database } from '@/lib/database.types';
 
 export async function createCustomerOrders(data: { customerId: string; cart: any[]; wishlist: any[] }): Promise<{ success: boolean; message: string; orderId?: string; }> {
   'use server';
@@ -29,14 +30,14 @@ export async function createCustomerOrders(data: { customerId: string; cart: any
     }
 
     // 1. Вставка заказа с указанием agent_id
-    const { data: order, error: orderError } = await supabase.from('customer_orders').insert({
+    const { data: order, error: orderError } = await supabase.from('customer_orders').insert([{
       customer_id: customerId,
       agent_id: user.id,
       created_by: user.id,
       status: 'new',
       priority: false,
-      created_at: new Date().toISOString(),
-    }).select().single();
+      // created_at будет установлен автоматически
+    }] as Database['public']['Tables']['customer_orders']['Insert'][]).select().single();
 
     if (orderError) {
       console.error('Ошибка создания заказа:', orderError);
@@ -56,12 +57,12 @@ export async function createCustomerOrders(data: { customerId: string; cart: any
       if (!productId) {
         const { data: newProduct, error: newProductError } = await supabase
           .from('products')
-          .insert({
-            title: item.product_name, // Убедитесь, что product_name передается с клиента
+          .insert([{
+            title: item.product_name || 'Новый товар',
             description: 'Новый товар, добавленный через заказ',
             unit: 'шт',
             // Другие обязательные поля, если есть
-          })
+          }] as Database['public']['Tables']['products']['Insert'][])
           .select('id')
           .single();
 
@@ -95,13 +96,20 @@ export async function createCustomerOrders(data: { customerId: string; cart: any
 
     let wishlistMessage = '';
     if (wishlist && wishlist.length > 0) {
-      const { error: wishlistError } = await supabase.from('customer_wishlist').insert({
+      const wishlistItems = wishlist.map((item: any) => ({
+        name: item.name,
+        qty: item.qty,
+        unit: item.unit || null,
+        category: item.category || null,
+        comment: item.comment || null
+      }));
+
+      const { error: wishlistError } = await supabase.from('customer_wishlist').insert([{
         customer_id: customerId,
         agent_id: user.id,
-        wishlist_items: wishlist,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+        wishlist_items: wishlistItems,
+        // created_at и updated_at будут установлены автоматически
+      }] as Database['public']['Tables']['customer_wishlist']['Insert'][]);
 
       if (wishlistError) {
         console.error('Ошибка создания хотелок:', wishlistError);

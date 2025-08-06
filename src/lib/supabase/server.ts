@@ -4,12 +4,12 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { Database } from '../database.types';
 
 // Универсальный SSR Supabase client: работает и в app-directory (через next/headers), и в pages/server actions (через параметр)
-export function createClient(customCookies?: any) {
+export async function createClient(customCookies?: any) {
   let cookies;
   try {
     // В app-directory и server components
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    cookies = require('next/headers').cookies?.();
+    // В Next.js 13+ используем асинхронный cookies API
+    cookies = (await import('next/headers')).cookies();
   } catch {
     // В pages-directory или при ошибке — используем переданные cookies
     cookies = customCookies;

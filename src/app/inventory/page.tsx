@@ -15,7 +15,7 @@ const formatDate = (dateString: string) => {
 import { formatCurrency } from '@/app/utils/formatCurrency';
 
 export default async function InventoryPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: products, error } = await supabase
     .from('products')

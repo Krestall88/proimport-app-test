@@ -3,7 +3,7 @@ import SupplierDetail from './SupplierDetail';
 import { notFound } from 'next/navigation';
 
 export default async function SupplierDetailPage({ params }: { params: { id: string } }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return notFound();
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();

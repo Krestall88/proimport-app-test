@@ -36,7 +36,8 @@ interface Order {
   due_date?: string;
 }
 
-export default async function InvoicePage({ params }: { params: { id: string } }) {
+export default async function (props: any) {
+  const { params } = props;
   const supabase = await createClient();
 
   const { data: order, error } = await supabase

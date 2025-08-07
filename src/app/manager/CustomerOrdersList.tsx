@@ -2,18 +2,20 @@
 
 import type { Database } from '@/lib/database.types';
 type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
+type CustomerOrderWithRelations = CustomerOrder & {
+  customers?: { name: string };
+  customer_order_items?: Array<{
+    purchase_price?: number;
+    final_price?: number;
+    quantity?: number;
+    product?: { title?: string };
+  }>;
+};
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface CustomerOrdersListProps {
-  orders: CustomerOrder[];
-}
-
-import type { Database } from '@/lib/database.types';
-type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
 import { formatCurrency } from '@/app/utils/formatCurrency';
 
 interface CustomerOrdersListProps {
-  orders: CustomerOrder[];
+  orders: CustomerOrderWithRelations[];
 }
 
 export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) {
@@ -35,10 +37,8 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
           </tr>
         </thead>
         <tbody>
-          {orders.map((order: CustomerOrder) => {
-            const orderTotal = (order.customer_order_items as any[] ?? []).reduce((sum: number, item: any) => {
-              // Предполагаем, что item содержит purchase_price, final_price, quantity
-              // Если нет, нужно будет скорректировать структуру данных и запрос
+          {orders.map((order: CustomerOrderWithRelations, idx: number) => {
+            const orderTotal = (order.customer_order_items ?? []).reduce((sum: number, item: { purchase_price?: number; final_price?: number; quantity?: number }) => {
               const purchase = (item.purchase_price ?? 0) * (item.quantity ?? 0);
               const final = (item.final_price ?? 0) * (item.quantity ?? 0);
               return sum + (final || purchase);
@@ -50,32 +50,17 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
                 <td className="p-2 border whitespace-nowrap">{new Date(order.created_at).toLocaleString('ru-RU')}</td>
                 <td className="p-2 border whitespace-nowrap">{order.status}</td>
                 <td className="p-2 border">
-                  <table className="min-w-[400px] w-full text-xs border-none">
-                    <thead>
-                      <tr>
-                        <th className="p-1 border">Наименование</th>
-                        <th className="p-1 border">Кол-во</th>
-                        <th className="p-1 border">Закуп. цена</th>
-                        <th className="p-1 border">Итог. цена</th>
-                        <th className="p-1 border">Сумма по позиции</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(order.items || []).map((item, idx) => {
-                        const sumPurchase = (item.purchase_price ?? 0) * (item.quantity ?? 0);
-                        const sumFinal = (item.final_price ?? 0) * (item.quantity ?? 0);
-                        return (
-                          <tr key={idx}>
-                            <td className="p-1 border whitespace-nowrap">{item.product_title || '-'}</td>
-                            <td className="p-1 border text-center">{item.quantity}</td>
-                            <td className="p-1 border text-right">{formatCurrency(item.purchase_price)}</td>
-                            <td className="p-1 border text-right">{formatCurrency(item.final_price)}</td>
-                            <td className="p-1 border text-right font-semibold">{formatCurrency(sumFinal || sumPurchase)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  {order.customer_order_items && order.customer_order_items.length > 0 ? (
+                    <ul>
+                      {order.customer_order_items.map((item: { products?: { title?: string }; quantity?: number }, idx: number) => (
+                        <li key={idx}>
+                          {item.product?.title ?? 'N/A'} — {item.quantity} шт.
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    '—'
+                  )}
                 </td>
                 <td className="p-2 border text-right font-bold text-lg">{formatCurrency(orderTotal)}</td>
               </tr>

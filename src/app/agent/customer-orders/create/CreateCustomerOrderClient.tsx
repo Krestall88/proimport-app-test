@@ -14,7 +14,7 @@ import WishlistSection from "./WishlistSection";
 
 interface InventoryProduct {
   product_id: string;
-  name: string;
+  product_name: string;
   sku: string;
   available_quantity: number;
   final_price: number;
@@ -43,7 +43,7 @@ interface CartItem extends InventoryProduct {
 }
 
 interface WishlistItem {
-  name: string;
+  product_name: string;
   qty: number;
   unit?: string;
   comment?: string;
@@ -112,8 +112,8 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         available_quantity: p.available_quantity - (cartQtys[p.product_id] || 0),
       }))
       .filter(p => p.available_quantity > 0 && 
-        (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         p.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+        ((p.product_name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+         (p.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
       );
     
     // DEBUG: Проверим, приходят ли данные с final_price
@@ -215,13 +215,13 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
     return cart.reduce((sum, item) => sum + (item.final_price * item.quantity), 0);
   }, [cart]);
 
-  const handleWishlistChange = (newWishlist: WishlistItem[]) => {
+  const handleWishlistChange = (newWishlist: any[]) => {
     setWishlist(newWishlist);
   };
 
   const handleAddWishlistToCart = (item: WishlistItem) => {
     // Найти соответствующий товар в инвентаре
-    const product = displayInventory.find(p => p.name === item.name);
+    const product = displayInventory.find(p => p.product_name === item.product_name);
     if (product) {
       const quantity = item.qty || 1;
       if (quantity <= product.available_quantity) {
@@ -232,15 +232,15 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         };
         handleAddToCart(cartItem);
       } else {
-        toast.error(`Недостаточно товара ${item.name} в наличии`);
+        toast.error(`Недостаточно товара ${item.product_name} в наличии`);
       }
     } else {
-      toast.error(`Товар ${item.name} не найден в остатках`);
+      toast.error(`Товар ${item.product_name} не найден в остатках`);
     }
   };
 
   const handleRemoveFromWishlist = (itemName: string) => {
-    setWishlist(prev => prev.filter(item => item.name !== itemName));
+    setWishlist(prev => prev.filter(item => item.product_name !== itemName));
   };
 
   return (
@@ -267,8 +267,6 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
           </Select>
         </div>
       </div>
-
-      {/* Остатки товаров */}
       <div className="mb-6">
         <div className="w-full">
           <h2 className="text-xl font-semibold mb-4">Остатки товаров</h2>
@@ -298,7 +296,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {displayInventory.map((product) => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">{product.product_name}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{product.description}</TableCell>
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{product.batch_number || '-'}</TableCell>
@@ -356,7 +354,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {cart.map((item) => (
                   <TableRow key={item.product_id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="font-medium">{item.product_name}</TableCell>
                     <TableCell className="text-right">{item.quantity} {item.unit}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.final_price * item.quantity)}</TableCell>

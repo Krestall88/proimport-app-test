@@ -117,29 +117,33 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
  */
 export async function getPurchaseOrderDetails(id: string): Promise<PurchaseOrderDetails | null> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  // 1. Получить заказ
+  const { data: order, error: orderError } = await supabase
     .from('purchase_orders')
-    .select(`
-      id,
-      expected_delivery_date,
-      status,
-      suppliers(name),
-      purchase_order_items:purchase_order_items!inner(
-        id,
-        product_id,
-        quantity_ordered,
-        products(*)
-      )
-    `)
+    .select(`id, expected_delivery_date, status, supplier:suppliers!inner(name)`)
     .eq('id', id)
     .single();
 
-  if (error) {
-    console.error(`Error fetching details for PO #${id}:`, error);
+  if (orderError) {
+    console.error(`Error fetching PO #${id}:`, orderError);
     return null;
   }
 
-  return data as unknown as PurchaseOrderDetails;
+  // 2. Получить связанные purchase_order_items с join по product_id
+  const { data: items, error: itemsError } = await supabase
+    .from('purchase_order_items')
+    .select(`id, product_id, quantity_ordered, product:products(id, title, nomenclature_code, unit, description, category, purchase_price, selling_price)`)
+    .eq('purchase_order_id', id);
+
+  if (itemsError) {
+    console.error(`Error fetching items for PO #${id}:`, itemsError);
+    return null;
+  }
+
+  return {
+    ...order,
+    purchase_order_items: items,
+  } as unknown as PurchaseOrderDetails;
 }
 
 //==============================================================================

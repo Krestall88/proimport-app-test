@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/server';
-import { Database } from '@/lib/database.types';
+import type { Database } from '@/lib/database.types';
 
 export async function createCustomerOrders(data: { customerId: string; cart: any[]; wishlist: any[] }): Promise<{ success: boolean; message: string; orderId?: string; }> {
   'use server';

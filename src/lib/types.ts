@@ -39,23 +39,25 @@ export interface Customer {
 export interface Supplier {
   id: string;
   name: string;
-  contact_person: string;
+  contact_person?: string; // опционально, если в БД нет такого поля
   contacts: {
     phone?: string | null;
     email?: string | null;
   } | null;
 }
 
+
 export interface Product {
   id: string;
-  title: string; // Renamed from name
-  nomenclature_code: string; // Renamed from sku
+  title: string;
+  nomenclature_code: string; // соответствует полю nomenclature_code в БД
   description: string | null;
   purchase_price: number;
   selling_price: number;
   category: string | null;
   unit: string | null;
 }
+
 
 //==============================================================================
 // SCM (Supply Chain Management) Types - Warehouse Operations
@@ -75,18 +77,19 @@ export type ProductInfo = {
 
 export type PurchaseOrderItem = {
   id: string;
+  purchase_order_id: string;
   product_id: string;
   quantity_ordered: number;
-  product: ProductInfo;
+  price_per_unit?: number;
+  product?: Product | null; // join по product_id
 };
 
 export type PurchaseOrder = {
   id: string;
-  expected_delivery_date: string;
+  expected_delivery_date: string | null;
   status: string;
-  supplier: {
-    name: string;
-  };
+  supplier_id: string;
+  supplier?: Supplier | null; // join по supplier_id
   purchase_order_items: PurchaseOrderItem[];
 };
 
@@ -324,17 +327,25 @@ export interface TopCustomer {
 
 export type InvoiceStatus = 'unpaid' | 'paid' | 'overdue' | 'cancelled';
 
-export interface Order {
+export type PurchaseOrderDetail = {
   id: string;
   created_at: string;
+  expected_delivery_date?: string;
   status: string;
-  customers: { name: string } | null;
-  customer_order_items: {
+  supplier?: {
+    name: string;
+  };
+  created_by_user?: {
+    full_name: string;
+  };
+  items: Array<{
+    id: string;
     quantity: number;
-    products: {
+    purchase_price: number;
+    product: {
       title: string;
-    } | null;
-  }[];
+    };
+  }>;
 };
 
 export type OrderWithCustomerDetails = {

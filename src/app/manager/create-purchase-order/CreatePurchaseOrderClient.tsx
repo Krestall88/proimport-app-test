@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/types';
+import { Product, Supplier } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
 import { Input } from '@/components/ui/input';
@@ -20,12 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 
-interface CartItem { product: Product; qty: number; editing: boolean }
-
-interface Supplier {
-  id: string;
-  name: string;
-}
+type CartItem = { product: Product; qty: number; editing: boolean };
 
 interface Props {
   products: Product[];
@@ -36,7 +31,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [allProducts, setAllProducts] = useState<Product[]>(products);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]); // глобальный тип Supplier
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [expectedDeliveryDate, setExpectedDeliveryDate] = useState<string>('');
   const router = useRouter();
@@ -49,7 +44,10 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
         toast.error('Не удалось загрузить список поставщиков.');
         console.error('Error fetching suppliers:', error);
       } else if (data) {
-        setSuppliers(data);
+        setSuppliers((data ?? []).map((s: any) => ({
+  ...s,
+  contacts: typeof s.contacts === 'object' && s.contacts !== null ? s.contacts : { phone: null, email: null }
+})) as Supplier[]);
       }
     };
     fetchSuppliers();
@@ -60,7 +58,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     return allProducts.filter(
       (p) =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.nomenclature_code.toLowerCase().includes(searchTerm.toLowerCase())
+        p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [allProducts, searchTerm]);
 
@@ -162,10 +160,19 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
   };
 
   const handleProductCreated = (newProduct: NewProduct) => {
-    const product = newProduct as Product;
-    setAllProducts((prevProducts) => [...prevProducts, product]);
-    // Сразу добавляем новый товар в корзину
-    addToCart(product);
+    const product: Product = {
+  id: newProduct.id,
+  title: newProduct.title,
+  sku: newProduct.sku ?? newProduct.nomenclature_code ?? '',
+  description: newProduct.description ?? '',
+  purchase_price: newProduct.purchase_price ?? 0,
+  selling_price: newProduct.selling_price ?? 0,
+  category: newProduct.category ?? null,
+  unit: newProduct.unit ?? null,
+};
+setAllProducts((prevProducts) => [...prevProducts, product]);
+// Сразу добавляем новый товар в корзину
+addToCart(product);
   };
 
   return (
@@ -196,7 +203,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
               {filteredProducts.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.title}</TableCell>
-                  <TableCell>{p.nomenclature_code}</TableCell>
+                  <TableCell>{p.sku}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => addToCart(p)}>
                       Добавить
@@ -224,7 +231,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="font-medium">{ci.product.title}</p>
-                        <p className="text-xs text-muted-foreground">{ci.product.nomenclature_code}</p>
+                        <p className="text-xs text-muted-foreground">{ci.product.sku}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -260,11 +267,11 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`nomenclature_code-${ci.product.id}`}>Артикул</Label>
+                            <Label htmlFor={`sku-${ci.product.id}`}>Артикул</Label>
                             <Input
-                              id={`nomenclature_code-${ci.product.id}`}
-                              value={ci.product.nomenclature_code}
-                              onChange={(e) => updateProductField(ci.product.id, 'nomenclature_code', e.target.value)}
+                              id={`sku-${ci.product.id}`}
+                              value={ci.product.sku}
+                              onChange={(e) => updateProductField(ci.product.id, 'sku', e.target.value)}
                               className="w-full"
                             />
                           </div>

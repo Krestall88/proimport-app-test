@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import ProductTable from '@/components/ProductTable';
 import CreateProductModal from '@/components/CreateProductModal';
 import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/lib/database.types';
+import type { Database } from '@/lib/database.types';
 import { toast } from 'sonner';
 
 type Product = Database['public']['Tables']['products']['Row'];

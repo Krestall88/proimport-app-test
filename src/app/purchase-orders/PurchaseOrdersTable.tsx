@@ -9,17 +9,7 @@ import StatusBadge from '@/components/StatusBadge';
 import { formatCurrency } from '@/app/utils/formatCurrency';
 import { deletePurchaseOrder } from './actions';
 
-interface PurchaseOrder {
-  id: string;
-  created_at: string;
-  status: string;
-  suppliers: { name: string } | { name: string }[] | null;
-  purchase_order_items: {
-    quantity_ordered: number;
-    price_per_unit: number;
-    products: { title: string } | { title: string }[] | null;
-  }[];
-}
+import { PurchaseOrder } from '@/lib/types';
 
 interface PurchaseOrdersTableProps {
   orders: PurchaseOrder[];
@@ -76,8 +66,8 @@ export default function PurchaseOrdersTable({ orders }: PurchaseOrdersTableProps
             <tbody className="[&_tr:last-child]:border-0">
               {orders?.map((order) => (
                 order.purchase_order_items.map(item => {
-                  const product = Array.isArray(item.products) ? item.products[0] : item.products;
-                  const supplier = Array.isArray(order.suppliers) ? order.suppliers[0] : order.suppliers;
+                  const product = item.product;
+                  const supplier = order.supplier;
 
                   if (!product || !supplier) {
                     return null;
@@ -89,7 +79,7 @@ export default function PurchaseOrdersTable({ orders }: PurchaseOrdersTableProps
                       <td className="p-4 align-middle font-medium">{product.title}</td>
                       <td className="p-4 align-middle">{supplier.name}</td>
                       <td className="p-4 align-middle">{item.quantity_ordered}</td>
-                      <td className="p-4 align-middle whitespace-nowrap">{formatCurrency(item.quantity_ordered * item.price_per_unit)}</td>
+                      <td className="p-4 align-middle whitespace-nowrap">{typeof product.purchase_price === 'number' ? formatCurrency(item.quantity_ordered * product.purchase_price) : '-'}</td>
                       <td className="p-4 align-middle"><StatusBadge status={order.status} /></td>
                       <td className="p-4 align-middle">
                         <Button variant="ghost" size="icon" onClick={() => handleDelete(order.id)} disabled={isPending}>

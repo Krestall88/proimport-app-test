@@ -3,6 +3,15 @@ import { createClient } from '@/lib/supabase/server';
 import StatusBadge from '../StatusBadge';
 import type { Database } from '@/lib/database.types';
 type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
+type CustomerOrderWithRelations = CustomerOrder & {
+  customers?: { name: string };
+  customer_order_items?: Array<{
+    purchase_price?: number;
+    final_price?: number;
+    quantity?: number;
+    products?: { title?: string; sku?: string; };
+  }>;
+};
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU');
@@ -44,7 +53,7 @@ export default async function AgentDashboard() {
     // Optionally return an error message to the UI
   }
 
-  const orders: CustomerOrder[] = (recentOrders as CustomerOrder[]) || [];
+  const orders: CustomerOrderWithRelations[] = (recentOrders as CustomerOrderWithRelations[]) || [];
 
   return (
     <div className="space-y-8">
@@ -93,10 +102,8 @@ export default async function AgentDashboard() {
                     <tr key={order.id} className="border-b border-gray-700 hover:bg-gray-700/50">
                       <td className="p-4 whitespace-nowrap">{formatDate(order.created_at)}</td>
                       <td className="p-4 font-medium">
-                        {order.customer_order_items.length > 0
-                          ? order.customer_order_items
-                              .map(item => `${item.products?.title ?? 'N/A'} (${item.quantity} шт.)`)
-                              .join(', ')
+                        {(order.customer_order_items?.length ?? 0) > 0
+                          ? order.customer_order_items?.map(item => `${item.products?.title ?? 'N/A'} (${item.quantity} шт.)`).join(', ')
                           : '—'}
                       </td>
                       <td className="p-4">{order.customers?.name ?? 'N/A'}</td>

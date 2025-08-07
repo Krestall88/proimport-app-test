@@ -43,12 +43,12 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
       quantity_received: item.quantity_ordered || '',
       batch_number: '',
       expiry_date: '',
-      description: item.products?.description ?? '',
+      description: item.product?.description ?? '-' ?? '',
       notes: '',
-      nomenclature_code: item.products?.nomenclature_code ?? '',
-      title: item.products?.title ?? '',
-      category: item.products?.category ?? '',
-      unit: item.products?.unit ?? '',
+      nomenclature_code: item.product?.nomenclature_code ?? '-' ?? '',
+      title: item.product?.title ?? '-' ?? '',
+      category: item.product?.category ?? '-' ?? '',
+      unit: item.product?.unit ?? '-' ?? '',
     };
     return acc;
   }, {} as FormState);
@@ -223,7 +223,7 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
                   <Input
                     id={`description-${item.id}`}
                     placeholder="Описание..."
-                    value={formState[item.id].description || item.products?.description || ''}
+                    value={formState[item.id].description || item.product?.description ?? '-' || ''}
                     onChange={e => handleInputChange(item.id, 'description', e.target.value)}
                     disabled={isSubmitting || isRowConfirmed[item.id]}
                     required

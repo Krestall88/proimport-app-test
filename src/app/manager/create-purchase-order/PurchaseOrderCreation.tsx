@@ -5,19 +5,17 @@ import ProductTable from '@/components/ProductTable';
 import CreateProductModal from '@/components/CreateProductModal';
 import { createPurchaseOrder } from './actions';
 import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/lib/database.types';
+import type { Database } from '@/lib/database.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
-type Product = Database['public']['Tables']['products']['Row'];
-type Supplier = Database['public']['Tables']['suppliers']['Row'];
+import type { Product, Supplier, PurchaseOrderItem } from '@/lib/types';
 
-interface CartItem extends Product {
-  quantity: number;
-}
+
+type CartItem = Product & { quantity: number };
 
 export default function PurchaseOrderCreation() {
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -29,7 +27,7 @@ export default function PurchaseOrderCreation() {
     }
   });
   const [quantities, setQuantities] = useState<{[key: string]: number}>({});
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]); // глобальный тип Supplier
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [expectedDeliveryDate, setExpectedDeliveryDate] = useState<string>('');
   const [isCreating, setIsCreating] = useState(false);
@@ -62,7 +60,10 @@ export default function PurchaseOrderCreation() {
       if (error) {
         toast.error('Ошибка при загрузке поставщиков');
       } else {
-        setSuppliers(data);
+        setSuppliers((data ?? []).map((s: any) => ({
+  ...s,
+  contacts: typeof s.contacts === 'object' && s.contacts !== null ? s.contacts : { phone: null, email: null }
+})));
       }
     };
         fetchSuppliers();
@@ -73,7 +74,10 @@ export default function PurchaseOrderCreation() {
       if (error) {
         toast.error('Ошибка при загрузке товаров');
       } else {
-        setProducts(data || []);
+        setProducts((data ?? []).map((p: any) => ({
+  ...p,
+  sku: p.sku ?? p.nomenclature_code ?? ''
+})) as Product[]);
       }
     };
     fetchProducts();
@@ -214,7 +218,7 @@ export default function PurchaseOrderCreation() {
                       const sum = qty * price;
                       return (
                         <TableRow key={item.id}>
-                          <TableCell>{item.nomenclature_code || '-'}</TableCell>
+                          <TableCell>{item.sku || '-'}</TableCell>
                           <TableCell className="font-medium">{item.title}</TableCell>
                           {(() => {
   const freshProduct = products.find(p => p.id === item.id) || item;

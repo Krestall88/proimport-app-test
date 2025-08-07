@@ -9,13 +9,12 @@ export default async function PurchaseOrdersPage() {
     .from('purchase_orders')
     .select(`
       id,
-      created_at,
+      expected_delivery_date,
       status,
-      suppliers ( name ),
-      purchase_order_items ( 
+      supplier ( name ),
+      purchase_order_items (
         quantity_ordered,
-        price_per_unit,
-        products ( title )
+        product:products ( title, purchase_price )
       )
     `)
     .order('created_at', { ascending: false });
@@ -24,6 +23,13 @@ export default async function PurchaseOrdersPage() {
     console.error('Error fetching purchase orders:', error);
     return <p>Не удалось загрузить закупочные заказы. Ошибка: {error.message}</p>;
   }
+
+  // Преобразуем expected_delivery_date к string, если оно null
+  const safeOrders = (orders || []).map(order => ({
+    ...order,
+    expected_delivery_date: order.expected_delivery_date || '',
+    supplier: order.supplier && typeof order.supplier.name === 'string' ? order.supplier : { name: '' },
+  }));
 
   return (
     <div className="space-y-6">
@@ -36,7 +42,7 @@ export default async function PurchaseOrdersPage() {
         </div>
       </div>
 
-      <PurchaseOrdersTable orders={orders || []} />
+      <PurchaseOrdersTable orders={safeOrders} />
     </div>
   );
 }

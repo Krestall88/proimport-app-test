@@ -8,9 +8,9 @@ import ReceivingForm from './ReceivingForm'; // Import the new component
 // и отображает интерактивную форму для приёмки товаров.
 
 export default async function (props: any) {
-  const { params } = props;
-  // Получаем ID из параметров маршрута
-  const orderId = params?.id;
+  let orderId;
+  const params = typeof props.params === 'function' ? await props.params() : props.params;
+  orderId = params?.id;
 
   if (!orderId) {
     notFound();
@@ -48,7 +48,7 @@ export default async function (props: any) {
         Заказ на закупку: <span className="font-mono text-sm">{orderDetails.id}</span>
       </p>
       <p className="text-muted-foreground">
-        Поставщик: <span className="font-semibold">{orderDetails.suppliers.name}</span>
+        Поставщик: <span className="font-semibold">{orderDetails.supplier?.name ?? '—'}</span>
       </p>
 
       {/* Заменяем статический список на интерактивную форму */}

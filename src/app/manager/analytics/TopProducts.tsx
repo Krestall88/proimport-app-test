@@ -21,7 +21,7 @@ export default function TopProducts({ data }: TopProductsProps) {
       </CardHeader>
       <CardContent className="grid gap-8">
         {data.map((product, idx) => (
-          <div className="flex items-center gap-4" key={product.id ?? product.name + '_' + product.initial + '_' + idx}>
+          <div className="flex items-center gap-4" key={product.name + '_' + product.initial + '_' + idx}>
             <Avatar className="hidden h-9 w-9 sm:flex">
               <AvatarFallback>{product.initial}</AvatarFallback>
             </Avatar>

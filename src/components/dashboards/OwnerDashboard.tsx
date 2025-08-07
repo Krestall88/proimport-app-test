@@ -33,22 +33,22 @@ async function OwnerDashboard() {
     dailyRevenueRes,
     topClientsRes
   ] = await Promise.all([
-    supabase.from('customer_orders').select('quantity, price_per_unit').eq('status', 'delivered'),
+    supabase.from('customer_order_items').select('quantity, price_per_unit, customer_orders!inner(status)').eq('customer_orders.status', 'delivered'),
     supabase.from('customer_orders').select('id', { count: 'exact' }).eq('status', 'pending'),
     supabase.from('customer_orders').select('id', { count: 'exact' }).eq('status', 'delivered'),
     supabase.from('customers').select('id', { count: 'exact' }),
-    supabase.from('customer_orders').select('id, created_at, customer:customers(name), status, customer_order_items(product:products(title))').order('created_at', { ascending: false }).limit(5),
+    supabase.from('customer_orders').select('id, created_at, customers(name), status, customer_order_items(quantity, products(title))').order('created_at', { ascending: false }).limit(5),
     supabase.from('customer_orders').select('status').returns<Array<{ status: string }>>(),
     supabase.rpc('get_daily_revenue', { days_ago: 30 }),
-    supabase.rpc('get_top_clients', { client_limit: 5 }),
+    supabase.rpc('get_top_customers'),
   ]);
 
   // Process stats
-  const totalRevenue = revenueRes.data?.reduce((sum, order) => sum + order.quantity * order.price_per_unit, 0) ?? 0;
+  const totalRevenue = revenueRes.data?.reduce((sum, item) => sum + item.quantity * item.price_per_unit, 0) ?? 0;
   const pendingOrdersCount = pendingOrdersRes.count ?? 0;
   const deliveredOrdersCount = deliveredOrdersRes.count ?? 0;
   const totalCustomers = customersRes.count ?? 0;
-  const recentOrders: Order[] = (recentOrdersRes.data as any) ?? [];
+  const recentOrders: Order[] = recentOrdersRes.data || [];
 
   // Process chart data
   const statusCounts = orderStatsRes.data?.reduce((acc, { status }) => {
@@ -59,7 +59,7 @@ async function OwnerDashboard() {
   const chartData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
   const revenueChartData = (dailyRevenueRes.data || []).map((d: any) => ({ ...d, date: new Date(d.date).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }) }));
-  const topClientsData = topClientsRes.data || [];
+  const topClientsData = topClientsRes.data?.map(client => ({ name: client.name, total: client.revenue })) ?? [];
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8">
@@ -108,8 +108,8 @@ async function OwnerDashboard() {
                   <tr key={order.id} className="border-b border-gray-700 last:border-b-0 hover:bg-gray-700/50">
                     <td className="p-3">
                       <div className="ml-4 space-y-1">
-                        <p className="font-medium">{order.customer_order_items[0]?.product?.title ?? 'Заказ'}</p>
-                        <p className="text-sm text-muted-foreground">Клиент: {order.customer?.name ?? 'N/A'}</p>
+                        <p className="font-medium">{order.customer_order_items.map(item => item.products?.title).join(', ') || 'Заказ'}</p>
+                        <p className="text-sm text-muted-foreground">Клиент: {order.customers?.name ?? 'N/A'}</p>
                       </div>
                     </td>
                     <td className="p-3 text-right">

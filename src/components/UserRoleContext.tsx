@@ -2,13 +2,15 @@
 
 import { createContext, useContext, ReactNode } from 'react';
 
+type UserRole = 'owner' | 'warehouse_manager' | 'agent' | 'driver';
+
 interface UserRoleContextType {
-  role: 'owner' | 'warehouse_manager' | 'agent';
+  role: UserRole;
 }
 
 const UserRoleContext = createContext<UserRoleContextType | undefined>(undefined);
 
-export function UserRoleProvider({ children, role }: { children: ReactNode; role: 'owner' | 'warehouse_manager' | 'agent' }) {
+export function UserRoleProvider({ children, role }: { children: ReactNode; role: UserRole }) {
   return (
     <UserRoleContext.Provider value={{ role }}>
       {children}

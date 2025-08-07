@@ -20,8 +20,8 @@ export default function TopCustomers({ data }: TopCustomersProps) {
         <CardTitle>Топ-5 клиентов по выручке</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-8">
-        {data.map((customer) => (
-          <div className="flex items-center gap-4" key={customer.name}>
+        {data.map((customer, idx) => (
+          <div className="flex items-center gap-4" key={`${customer.name}_${idx}`}>
             <Avatar className="hidden h-9 w-9 sm:flex">
               <AvatarFallback>{customer.initial}</AvatarFallback>
             </Avatar>

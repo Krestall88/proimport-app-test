@@ -7,11 +7,16 @@ export interface CustomerOrderItem {
 }
 
 export interface CustomerOrder {
-    id: string; // Changed to string for consistency
-    customer_name: string;
+    id: string;
+    customers: { name: string } | null;
     status: 'pending' | 'picking' | 'ready_for_shipment' | 'shipped';
     created_at: string;
-    items: CustomerOrderItem[];
+    customer_order_items: {
+        quantity: number;
+        products: {
+            title: string;
+        } | null;
+    }[];
 }
 
 
@@ -336,16 +341,16 @@ export interface TopCustomer {
 
 export type InvoiceStatus = 'unpaid' | 'paid' | 'overdue' | 'cancelled';
 
-export type Order = {
+export interface Order {
   id: string;
   created_at: string;
   status: string;
-  customer: { name: string } | null;
+  customers: { name: string } | null;
   customer_order_items: {
     quantity: number;
-    product: {
+    products: {
       title: string;
-    }
+    } | null;
   }[];
 };
 
@@ -374,6 +379,36 @@ export type InvoiceOrder = {
       title: string;
     }
   }[];
+};
+
+export type OrderWithFinanceDetails = {
+  id: string;
+  created_at: string;
+  product_name: string;
+  quantity: number;
+  price_per_unit: number;
+  status: string;
+  supplier: { name: string } | null;
+  customer: { name: string } | null;
+  invoice: { id: string }[] | null;
+};
+
+export type FinancialOrderItem = {
+  id: string; // id of the customer_order_item
+  quantity: number;
+  price_per_unit: number;
+  products: {
+    title: string;
+  } | null;
+  customer_orders: {
+    id: string; // id of the customer_order
+    created_at: string;
+    status: string;
+    customers: {
+      name: string;
+    } | null;
+    invoices: { id: string }[] | null;
+  } | null;
 };
 
 export interface Invoice {

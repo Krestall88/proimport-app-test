@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
   const searchParams = useSearchParams()
-  const message = searchParams.get('message')
+  const message = searchParams?.get('message')
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">

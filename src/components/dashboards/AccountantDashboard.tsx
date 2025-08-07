@@ -1,41 +1,46 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { OrderWithFinanceDetails } from '@/lib/types';
+import { FinancialOrderItem } from '@/lib/types';
 
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU');
 const formatCurrency = (amount: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(amount);
 
 async function DeliveredOrdersList() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
-  // Fetch delivered orders that don't have an invoice yet
-  const { data: orders, error } = await supabase
-    .from('customer_orders')
+  const { data: items, error } = await supabase
+    .from('customer_order_items')
     .select(`
-      id, 
-      created_at, 
-      product_name, 
+      id,
       quantity,
       price_per_unit,
-      status,
-      supplier:suppliers (name),
-      customer:customers (name),
-      invoice:invoices(id)
+      products (title),
+      customer_orders (
+        id,
+        created_at,
+        status,
+        customers (name),
+        invoices (id)
+      )
     `)
-    .eq('status', 'delivered')
-    .is('invoices.id', null)
-    .order('created_at', { ascending: false });
+    // @ts-ignore
+    .eq('customer_orders.status', 'delivered')
+    // @ts-ignore
+    .is('customer_orders.invoices.id', null)
+    .order('created_at', { referencedTable: 'customer_orders', ascending: false });
 
   if (error) {
-    console.error('Error fetching delivered orders:', error);
+    console.error('Error fetching delivered order items:', error);
     return <p className="text-red-400">Не удалось загрузить финансовые данные.</p>;
   }
 
+  const orderItems = items as FinancialOrderItem[];
+
   return (
     <div>
-      <h3 className="text-xl font-semibold mb-4">Завершенные заказы ({orders.length})</h3>
-      {orders.length === 0 ? (
-        <p className="text-gray-400">Нет завершенных заказов для отображения.</p>
+      <h3 className="text-xl font-semibold mb-4">Готовые к выставлению счета ({orderItems.length})</h3>
+      {orderItems.length === 0 ? (
+        <p className="text-gray-400">Нет позиций для выставления счета.</p>
       ) : (
         <div className="overflow-x-auto bg-gray-800 rounded-lg">
           <table className="min-w-full text-left">
@@ -43,23 +48,21 @@ async function DeliveredOrdersList() {
               <tr>
                 <th className="p-4 font-semibold">Дата</th>
                 <th className="p-4 font-semibold">Товар</th>
-                <th className="p-4 font-semibold">Поставщик</th>
                 <th className="p-4 font-semibold">Клиент</th>
                 <th className="p-4 font-semibold text-right">Сумма</th>
                 <th className="p-4 font-semibold"></th>
               </tr>
             </thead>
             <tbody>
-              {(orders as OrderWithFinanceDetails[]).map(order => (
-                <tr key={order.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                  <td className="p-4 whitespace-nowrap">{formatDate(order.created_at)}</td>
-                  <td className="p-4 font-medium">{order.product_name} ({order.quantity} шт.)</td>
-                  <td className="p-4">{order.supplier?.[0]?.name ?? 'N/A'}</td>
-                  <td className="p-4">{order.customer?.[0]?.name ?? 'N/A'}</td>
-                  <td className="p-4 text-right font-mono">{formatCurrency(order.quantity * order.price_per_unit)}</td>
+              {orderItems.map(item => (
+                <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                  <td className="p-4 whitespace-nowrap">{item.customer_orders ? formatDate(item.customer_orders.created_at) : '-'}</td>
+                  <td className="p-4 font-medium">{item.products?.title ?? 'Товар не найден'} ({item.quantity} шт.)</td>
+                  <td className="p-4">{item.customer_orders?.customers?.name ?? 'Клиент не найден'}</td>
+                  <td className="p-4 text-right font-mono">{formatCurrency(item.quantity * item.price_per_unit)}</td>
                   <td className="p-4">
-                    <Link href={`/customer-orders/${order.id}`} className="text-blue-400 hover:underline">
-                      Детали
+                    <Link href={`/manager/orders/${item.customer_orders?.id}`} className="text-blue-400 hover:underline">
+                      К заказу
                     </Link>
                   </td>
                 </tr>

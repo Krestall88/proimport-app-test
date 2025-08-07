@@ -21,7 +21,7 @@ interface AppShellProps {
   navLinks: { href: string; label: string; icon: React.ReactNode; notificationBadgeCount?: number }[];
   title: string;
   children: React.ReactNode;
-  role: 'owner' | 'warehouse_manager' | 'agent';
+  role: 'owner' | 'warehouse_manager' | 'agent' | 'driver';
 }
 
 export function AppShell({

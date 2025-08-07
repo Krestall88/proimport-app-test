@@ -1,13 +1,15 @@
 'use client';
 
-import type { CustomerOrder } from '@/lib/types';
+import type { Database } from '@/lib/database.types';
+type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CustomerOrdersListProps {
   orders: CustomerOrder[];
 }
 
-import type { CustomerOrder } from '@/lib/types';
+import type { Database } from '@/lib/database.types';
+type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
 import { formatCurrency } from '@/app/utils/formatCurrency';
 
 interface CustomerOrdersListProps {
@@ -33,8 +35,8 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => {
-            const orderTotal = (order.items || []).reduce((sum, item) => {
+          {orders.map((order: CustomerOrder) => {
+            const orderTotal = (order.customer_order_items as any[] ?? []).reduce((sum: number, item: any) => {
               // Предполагаем, что item содержит purchase_price, final_price, quantity
               // Если нет, нужно будет скорректировать структуру данных и запрос
               const purchase = (item.purchase_price ?? 0) * (item.quantity ?? 0);
@@ -44,7 +46,7 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
             return (
               <tr key={order.id} className="align-top border-b">
                 <td className="p-2 border font-mono whitespace-nowrap">{order.id.substring(0, 8)}</td>
-                <td className="p-2 border whitespace-nowrap">{order.customer_name}</td>
+                <td className="p-2 border">{order.customers?.name ?? ''}</td>
                 <td className="p-2 border whitespace-nowrap">{new Date(order.created_at).toLocaleString('ru-RU')}</td>
                 <td className="p-2 border whitespace-nowrap">{order.status}</td>
                 <td className="p-2 border">

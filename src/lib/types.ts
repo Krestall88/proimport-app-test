@@ -1,23 +1,6 @@
 export type Role = 'owner' | 'agent' | 'warehouse_manager' | 'driver' | 'accountant';
 
-export interface CustomerOrderItem {
-    id: string; // Changed to string for consistency
-    product_name: string;
-    quantity: number;
-}
 
-export interface CustomerOrder {
-    id: string;
-    customers: { name: string } | null;
-    status: 'pending' | 'picking' | 'ready_for_shipment' | 'shipped';
-    created_at: string;
-    customer_order_items: {
-        quantity: number;
-        products: {
-            title: string;
-        } | null;
-    }[];
-}
 
 
 export interface Profile {

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import StatusBadge from '../StatusBadge';
-import type { CustomerOrder } from '@/lib/types';
+import type { Database } from '@/lib/database.types';
+type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU');
@@ -43,7 +44,7 @@ export default async function AgentDashboard() {
     // Optionally return an error message to the UI
   }
 
-  const orders = recentOrders as CustomerOrder[] || [];
+  const orders: CustomerOrder[] = (recentOrders as CustomerOrder[]) || [];
 
   return (
     <div className="space-y-8">

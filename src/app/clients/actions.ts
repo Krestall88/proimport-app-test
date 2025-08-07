@@ -26,15 +26,23 @@ export async function getCustomers(searchTerm?: string): Promise<CustomerInfo[]>
     return [];
   }
 
-  return data.map(customer => ({
-    customer_id: customer.id,
-    name: customer.name,
-    contacts: customer.contacts || { phone: null, email: null },
-    tin: customer.tin || undefined,
-    kpp: customer.kpp || undefined,
-    delivery_address: customer.delivery_address || undefined,
-    payment_terms: customer.payment_terms || undefined
-  }));
+  return data.map(customer => {
+    const contacts = customer.contacts;
+    const parsedContacts = 
+      typeof contacts === 'object' && contacts !== null && !Array.isArray(contacts)
+      ? contacts as { phone?: string | null; email?: string | null }
+      : { phone: null, email: null };
+
+    return {
+      customer_id: customer.id,
+      name: customer.name,
+      contacts: parsedContacts,
+      tin: customer.tin || undefined,
+      kpp: customer.kpp || undefined,
+      delivery_address: customer.delivery_address || undefined,
+      payment_terms: customer.payment_terms || undefined
+    };
+  });
 }
 
 /**
@@ -56,7 +64,31 @@ export async function getClientById(id: string): Promise<Customer | null> {
     return null;
   }
 
-  return data;
+  if (!data) {
+    return null;
+  }
+
+  // Safely parse the JSONB contacts field
+  const contacts = data.contacts;
+  const parsedContacts =
+    typeof contacts === 'object' && contacts !== null && !Array.isArray(contacts)
+      ? (contacts as { phone?: string | null; email?: string | null })
+      : { phone: null, email: null };
+
+  const bankDetails = data.bank_details;
+  const parsedBankDetails =
+    typeof bankDetails === 'object' && bankDetails !== null && !Array.isArray(bankDetails)
+      ? (bankDetails as { bank_name?: string | null; bic?: string | null; account_number?: string | null })
+      : null;
+
+  // Construct a type-safe Customer object
+  const customer: Customer = {
+    ...data,
+    contacts: parsedContacts,
+    bank_details: parsedBankDetails,
+  };
+
+  return customer;
 }
 
 /**

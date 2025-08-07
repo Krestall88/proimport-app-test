@@ -30,21 +30,21 @@ export interface Profile {
 export interface Customer {
   id: string;
   name: string;
-  address: string;
+  address?: string | null;
   contacts: {
     phone?: string | null;
     email?: string | null;
   } | null;
-  tin?: string; // ИНН
-  kpp?: string; // КПП
-  delivery_address?: string; // Адрес доставки
-  payment_terms?: string; // Условия оплаты
-  comments?: string; // Комментарии
+  tin?: string | null; // ИНН
+  kpp?: string | null; // КПП
+  delivery_address?: string | null; // Адрес доставки
+  payment_terms?: string | null; // Условия оплаты
+  comments?: string | null; // Комментарии
   created_at: string;
   bank_details?: {
-    bank_name?: string;
-    bic?: string;
-    account_number?: string;
+    bank_name?: string | null;
+    bic?: string | null;
+    account_number?: string | null;
   } | null;
 }
 

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import ClientDetail from './ClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function (props: any) {
+const ManagerClientDetailPage = async function (props: any) {
   const { params } = props;
   const supabase = await createClient();
 
@@ -39,3 +39,6 @@ export default async function (props: any) {
     </div>
   );
 }
+
+ManagerClientDetailPage.displayName = 'ManagerClientDetailPage';
+export default ManagerClientDetailPage;

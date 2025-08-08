@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getCustomers } from './actions';
 
-export default async function (props: any) {
+const ClientsPage = async function (props: any) {
   const { searchParams } = props;
   const supabase = await createClient();
 

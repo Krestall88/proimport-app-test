@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import SupplierDetail from './SupplierDetail';
 import { notFound } from 'next/navigation';
 
-export default async function (props: any) {
+const ManagerSupplierDetailPage = async function (props: any) {
   const { params } = props;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -13,3 +13,5 @@ export default async function (props: any) {
   const canEdit = profile?.role === 'owner';
   return <SupplierDetail supplier={supplier} canEdit={canEdit} />;
 }
+ManagerSupplierDetailPage.displayName = 'ManagerSupplierDetailPage';
+export default ManagerSupplierDetailPage;

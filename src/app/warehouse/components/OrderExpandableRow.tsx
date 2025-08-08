@@ -18,19 +18,19 @@ export function OrderExpandableRow({ order, onConfirmPicking }: { order: any, on
         <TableCell style={{ width: 32 }}>
           {Array.isArray(order.order_items) && order.order_items.length > 0 ? <OrderRowExpandIcon expanded={expanded} /> : null}
         </TableCell>
-        <TableCell className="font-medium">{order.id?.substring(0, 8) ?? ''}</TableCell>
+        <TableCell className="font-medium">{order.order_item_id?.substring(0, 8) ?? ''}</TableCell>
         <TableCell>{order.customer_name ?? order.customer?.name ?? ''}</TableCell>
         <TableCell>{order.created_at ? new Date(order.created_at).toLocaleDateString() : ''}</TableCell>
         <TableCell>{order.status ?? ''}</TableCell>
         <TableCell>
           <form
             action={async (formData) => {
-              const orderId = order.id;
+              const orderId = order.order_item_id;
               await onConfirmPicking(orderId);
             }}
             onClick={e => e.stopPropagation()}
           >
-            <input type="hidden" name="orderId" value={order.id} />
+            <input type="hidden" name="orderId" value={order.order_item_id} />
             <Button
               variant="outline"
               size="sm"

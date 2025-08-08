@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import AgentClientDetail from './AgentClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function (props: any) {
+const AgentClientDetailPage = async function (props: any) {
   const { params } = props;
   const supabase = await createClient();
 
@@ -40,3 +40,6 @@ export default async function (props: any) {
     </div>
   );
 }
+
+AgentClientDetailPage.displayName = 'AgentClientDetailPage';
+export default AgentClientDetailPage;

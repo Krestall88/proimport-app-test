@@ -1,8 +1,8 @@
 'use client';
 
 import type { Database } from '@/lib/database.types';
-type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
-type CustomerOrderWithRelations = CustomerOrder & {
+import type { ManagerOrderItem } from '@/lib/types';
+type CustomerOrderWithRelations = ManagerOrderItem & {
   customers?: { name: string };
   customer_order_items?: Array<{
     purchase_price?: number;
@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatCurrency } from '@/app/utils/formatCurrency';
 
 interface CustomerOrdersListProps {
-  orders: CustomerOrderWithRelations[];
+  orders: CustomerOrderWithRelations[]; // теперь это расширенный ManagerOrderItem
 }
 
 export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) {
@@ -44,8 +44,8 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
               return sum + (final || purchase);
             }, 0);
             return (
-              <tr key={order.id} className="align-top border-b">
-                <td className="p-2 border font-mono whitespace-nowrap">{order.id.substring(0, 8)}</td>
+              <tr key={order.order_item_id} className="align-top border-b">
+                <td className="p-2 border font-mono whitespace-nowrap">{order.order_item_id.substring(0, 8)}</td>
                 <td className="p-2 border">{order.customers?.name ?? ''}</td>
                 <td className="p-2 border whitespace-nowrap">{new Date(order.created_at).toLocaleString('ru-RU')}</td>
                 <td className="p-2 border whitespace-nowrap">{order.status}</td>

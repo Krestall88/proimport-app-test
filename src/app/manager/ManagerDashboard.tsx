@@ -8,7 +8,7 @@ import CustomerOrdersList from './CustomerOrdersList';
 import ReceiptsWithComments from './ReceiptsWithComments';
 import CustomerList from './CustomerList'; // Импортируем новый компонент
 import AnalyticsDashboard from './analytics/AnalyticsDashboard'; // Импортируем дашборд аналитики
-import type { ManagerInventoryItem, CustomerOrder, ManagerGoodsReceipt, CustomerInfo, AnalyticsKpis, SalesChartDataPoint, TopProduct, TopCustomer } from '@/lib/types';
+import type { ManagerInventoryItem, ManagerOrderItem, ManagerGoodsReceipt, CustomerInfo, AnalyticsKpis, SalesChartDataPoint, TopProduct, TopCustomer } from '@/lib/types';
 
 interface AnalyticsData {
   kpis: AnalyticsKpis;
@@ -19,7 +19,7 @@ interface AnalyticsData {
 
 interface ManagerDashboardProps {
   inventory: ManagerInventoryItem[];
-  customerOrders: CustomerOrder[];
+  customerOrders: ManagerOrderItem[];
   goodsReceipts: ManagerGoodsReceipt[];
   customers: CustomerInfo[];
   analyticsData: AnalyticsData; // Добавляем данные аналитики

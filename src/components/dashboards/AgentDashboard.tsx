@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import StatusBadge from '../StatusBadge';
 import type { Database } from '@/lib/database.types';
+import type { Database } from '@/lib/database.types';
 type CustomerOrder = Database['public']['Tables']['customer_orders']['Row'];
 type CustomerOrderWithRelations = CustomerOrder & {
   customers?: { name: string };

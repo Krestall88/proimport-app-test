@@ -4,6 +4,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { getManagerCustomerOrders } from '@/lib/actions/orders';
+import type { ManagerOrderItem } from '@/lib/types';
 import ExpandableOrdersTable from '@/components/ui/ExpandableOrdersTable';
 import Link from 'next/link';
 import { deleteOrders } from './actions';
@@ -17,7 +18,7 @@ export default function ManagerOrdersPage() {
   const [dialogState, setDialogState] = useState({ isOpen: false, orderIds: [] as string[] });
 
   useEffect(() => {
-    getManagerCustomerOrders().then(setOrders);
+    getManagerCustomerOrders().then((orders: ManagerOrderItem[]) => setOrders(orders));
   }, []);
 
   const openDeleteDialog = (orderIds: string[]) => {

@@ -14,7 +14,7 @@ const formatDate = (dateString: string) => {
 
 import { formatCurrency } from '@/app/utils/formatCurrency';
 
-export default async function InventoryPage() {
+const InventoryPage = async function InventoryPage() {
   const supabase = await createClient();
 
   const { data: products, error } = await supabase
@@ -36,7 +36,7 @@ export default async function InventoryPage() {
 
   if (error) {
     console.error('Error fetching inventory:', error);
-    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы 'products' и 'inventory_items' созданы.</p>;
+    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы &apos;products&apos; и &apos;inventory_items&apos; созданы.</p>;
   }
 
   return (

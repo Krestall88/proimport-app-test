@@ -7,12 +7,10 @@ import { useState } from 'react';
 import { OrderRowExpandIcon } from './OrderRowExpandIcon';
 import { OrderExpandableRow } from './OrderExpandableRow';
 
-interface CustomerOrdersProps {
-  customerOrders: any[]; // Replace 'any' with a proper type later
-}
+import type { WarehouseOrderItem } from '@/lib/types';
 
 interface CustomerOrdersProps {
-  customerOrders: any[];
+  customerOrders: WarehouseOrderItem[];
   onConfirmPicking: (orderId: string) => Promise<void>;
 }
 
@@ -38,7 +36,7 @@ export default function CustomerOrders({ customerOrders, onConfirmPicking }: Cus
   
         <TableBody>
           {customerOrders.map((order) => (
-            <OrderExpandableRow key={order.id} order={order} onConfirmPicking={onConfirmPicking} />
+            <OrderExpandableRow key={order.order_item_id} order={order} onConfirmPicking={onConfirmPicking} />
           ))}
         </TableBody>
         </Table>

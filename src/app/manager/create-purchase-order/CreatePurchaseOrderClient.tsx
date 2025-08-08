@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 
-type CartItem = { product: Product; qty: number; editing: boolean };
+type CartItem = { product: Product; qty: number };
 
 interface Props {
   products: Product[];
@@ -70,7 +70,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
         return prev;
       }
       toast.success(`${p.title} добавлен в корзину.`);
-      return [...prev, { product: p, qty: 1, editing: false }];
+      return [...prev, { product: p, qty: 1 }];
     });
   };
 
@@ -78,7 +78,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     setEditingProduct(product);
     setCart((prev) => 
       prev.map((item) => 
-        item.product.id === product.id ? { ...item, editing: true } : item
+        item
       )
     );
   };
@@ -86,7 +86,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
   const stopEditing = () => {
     setEditingProduct(null);
     setCart((prev) => 
-      prev.map((item) => ({ ...item, editing: false }))
+      prev.map((item) => item)
     );
   };
 
@@ -167,10 +167,12 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
       description: newProduct.description ?? '',
       purchase_price: newProduct.purchase_price ?? 0,
       selling_price: newProduct.selling_price ?? 0,
-      category: newProduct.category ?? null,
-      unit: newProduct.unit ?? null,
+      category: newProduct.category ?? '',
+      unit: newProduct.unit ?? '',
       batch_number: newProduct.batch_number ?? '',
       expiry_date: newProduct.expiry_date ?? '',
+      created_at: newProduct.created_at ?? '',
+      supplier_id: newProduct.supplier_id ?? null,
     };
     setAllProducts((prevProducts) => [...prevProducts, product]);
     // Сразу добавляем новый товар в корзину
@@ -291,7 +293,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                             <Input
                               id={`expiry_date-${ci.product.id}`}
                               type="date"
-                              value={ci.product.expiry_date ?? ''}
+                              value={ci.product.expiry_date}
                               onChange={(e) => updateProductField(ci.product.id, 'expiry_date', e.target.value)}
                               className="w-full"
                             />

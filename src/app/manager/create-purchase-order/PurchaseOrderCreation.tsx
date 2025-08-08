@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import type { Product, Supplier, PurchaseOrderItem } from '@/lib/types';
 
 
-type CartItem = Product & { quantity: number };
+type CartItem = { product: Product; qty: number };
 
 export default function PurchaseOrderCreation() {
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -94,11 +94,19 @@ export default function PurchaseOrderCreation() {
         return;
     }
 
+    const safeProduct: Product = {
+      ...product,
+      category: product.category ?? '',
+      unit: product.unit ?? '',
+      expiry_date: product.expiry_date ?? '',
+      batch_number: product.batch_number ?? '',
+    };
+
     setCart(prev => {
-        const existingItem = prev.find(item => item.id === product.id);
+        const existingItem = prev.find(item => item.product.id === product.id);
         const updated = existingItem
-          ? prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item)
-          : [...prev, { ...product, quantity }];
+          ? prev.map(item => item.product.id === product.id ? { ...item, qty: item.qty + quantity } : item)
+          : [...prev, { product: safeProduct, qty: quantity }];
         // Сохраняем корзину в localStorage
         localStorage.setItem('managerPurchaseOrderCart', JSON.stringify(updated));
         return updated;
@@ -107,14 +115,21 @@ export default function PurchaseOrderCreation() {
   };
 
     const handleProductCreated = (newProduct: Product, quantity: number) => {
-    setProducts(prev => [...prev, newProduct]);
-    setCart(prev => [...prev, { ...newProduct, quantity }]);
-    toast.success(`${newProduct.title} добавлен в корзину`);
+    const safeProduct: Product = {
+      ...newProduct,
+      category: newProduct.category ?? '',
+      unit: newProduct.unit ?? '',
+      expiry_date: newProduct.expiry_date ?? '',
+      batch_number: newProduct.batch_number ?? '',
+    };
+    setProducts(prev => [...prev, safeProduct]);
+    setCart(prev => [...prev, { product: safeProduct, qty: quantity }]);
+    toast.success(`${safeProduct.title} добавлен в корзину`);
   };
 
   const removeFromCart = (productId: string) => {
     setCart(prev => {
-      const updated = prev.filter(item => item.id !== productId);
+      const updated = prev.filter(item => item.product.id !== productId);
       localStorage.setItem('managerPurchaseOrderCart', JSON.stringify(updated));
       return updated;
     });
@@ -213,15 +228,15 @@ export default function PurchaseOrderCreation() {
                 ) : (
                   <>
                     {cart.map(item => {
-                      const qty = item.quantity || 0;
-                      const price = typeof item.purchase_price !== 'undefined' ? Number(item.purchase_price) : 0;
+                      const qty = item.qty || 0;
+                      const price = typeof item.product.purchase_price !== 'undefined' ? Number(item.product.purchase_price) : 0;
                       const sum = qty * price;
                       return (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.nomenclature_code || '-'}</TableCell>
-                          <TableCell className="font-medium">{item.title}</TableCell>
+                        <TableRow key={item.product.id}>
+                          <TableCell>{item.product.nomenclature_code || '-'}</TableCell>
+                          <TableCell className="font-medium">{item.product.title}</TableCell>
                           {(() => {
-  const freshProduct = products.find(p => p.id === item.id) || item;
+  const freshProduct = products.find(p => p.id === item.product.id) || item.product;
   return <>
     <TableCell>{freshProduct.description || '-'}</TableCell>
     <TableCell>{freshProduct.category || '-'}</TableCell>
@@ -233,7 +248,7 @@ export default function PurchaseOrderCreation() {
                           <TableCell>{price || '-'}</TableCell>
                           <TableCell>{sum ? sum.toLocaleString() : '-'}</TableCell>
                           <TableCell className="text-right">
-                            <Button variant="destructive" size="sm" onClick={() => removeFromCart(item.id)}>
+                            <Button variant="destructive" size="sm" onClick={() => removeFromCart(item.product.id)}>
                               Удалить
                             </Button>
                           </TableCell>
@@ -245,8 +260,8 @@ export default function PurchaseOrderCreation() {
                       <TableCell colSpan={8} className="text-right font-bold">Итого:</TableCell>
                       <TableCell className="font-bold">
                         {cart.reduce((acc, item) => {
-                          const qty = item.quantity || 0;
-                          const price = typeof item.purchase_price !== 'undefined' ? Number(item.purchase_price) : 0;
+                          const qty = item.qty || 0;
+                          const price = typeof item.product.purchase_price !== 'undefined' ? Number(item.product.purchase_price) : 0;
                           return acc + qty * price;
                         }, 0).toLocaleString()}
                       </TableCell>

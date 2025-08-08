@@ -3,11 +3,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-interface CartItem {
-  id: string;
-  quantity: number;
-  purchase_price: number | null;
-}
+import type { Product } from '@/lib/types';
+
+type CartItem = { product: Product; qty: number }; // глобальный формат корзины
 
 export async function createProductFromWishlist(product: {
   nomenclature_code: string;
@@ -58,9 +56,9 @@ export async function createPurchaseOrder(supplierId: string, cartItems: CartIte
   // 2. Prepare purchase order items
   const orderItems = cartItems.map(item => ({
     purchase_order_id: purchaseOrderId,
-    product_id: item.id,
-    quantity_ordered: item.quantity,
-    price_per_unit: item.purchase_price,
+    product_id: item.product.id,
+    quantity_ordered: item.qty,
+    price_per_unit: item.product.purchase_price ?? 0,
   }));
 
   // 3. Insert purchase order items

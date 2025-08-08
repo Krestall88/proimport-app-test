@@ -145,7 +145,7 @@ export default function InventoryTable({ inventory, loading }: InventoryTablePro
                 <TableCell>{item.product.description}</TableCell>
                 <TableCell>{item.product.category}</TableCell>
                 <TableCell>{item.product.batch_number}</TableCell>
-                <TableCell>{item.product?.expiry_date ? format(new Date(item.product.expiry_date), 'dd.MM.yyyy') : '-'}</TableCell>
+                <TableCell>{item.product.expiry_date ? format(new Date(item.product.expiry_date), 'dd.MM.yyyy') : '-'}</TableCell>
                 <TableCell className="text-right">{item.available_quantity}</TableCell>
                 <TableCell>{item.product.unit}</TableCell>
                 <TableCell className="text-right">{formatCurrency(item.purchase_price)}</TableCell>

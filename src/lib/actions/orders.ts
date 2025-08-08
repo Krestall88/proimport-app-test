@@ -77,7 +77,7 @@ async function getOrders(role: 'agent' | 'owner'): Promise<Order[]> {
         title: item.product?.title || 'Неизвестный товар',
         sku: item.product?.sku || '',
         batch_number: item.product?.batch_number || '',
-        expiry_date: item.product?.expiry_date || '',
+        expiry_date: item.product?.expiry_date,
         unit: item.product?.unit || '',
         category: item.product?.category || '',
         description: item.product?.description,

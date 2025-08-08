@@ -37,7 +37,7 @@ interface AgentOrderItem {
     batch_number: string;
     expiry_date: string;
     nomenclature_code: string;
-    unit?: string | null;
+    unit: string;
   };
   available_quantity: number;
   price_per_unit?: number;

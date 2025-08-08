@@ -5,7 +5,7 @@ export interface InventoryProduct {
   title: string; // вместо name
   nomenclature_code: string;
   available_quantity: number;
-  expiry_date?: string | null;
+  expiry_date: string;
   description: string; // теперь всегда строка, даже если поле пустое
   batch_number: string;
   unit: string;

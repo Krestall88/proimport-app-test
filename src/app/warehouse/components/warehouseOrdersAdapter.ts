@@ -4,7 +4,7 @@ export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseO
   // Если массив уже плоский (warehouse_orders_view), просто возвращаем его как есть
   if (rawOrders.length > 0 && rawOrders[0].order_item_id) {
     return rawOrders.map((item: any) => ({
-      order_id: item.order_id,
+      purchase_order_id: item.order_id,
       created_at: item.created_at,
       shipped_at: null,
       status: item.status,
@@ -24,25 +24,21 @@ export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseO
   // Старый режим: вложенные order_items (на всякий случай)
   const rows: WarehouseOrderItem[] = [];
   for (const order of rawOrders) {
-    const { id: order_id, created_at, status, customer_name, customer, order_items } = order;
+    const { id, created_at, status, customer_name, customer, order_items } = order;
     if (Array.isArray(order_items)) {
       for (const item of order_items) {
         rows.push({
-          order_id,
+          purchase_order_id: id,
           created_at,
           shipped_at: item.shipped_at || null,
           status,
           customer_name,
           customer,
           order_item_id: item.id,
-          product_title: item.product?.title || '-',
-          description: item.product?.description || '-',
-          nomenclature_code: item.product?.nomenclature_code || '-',
-          category: item.product?.category || '-',
-          expiry_date: item.expiry_date || null,
-          batch_number: item.batch_number || null,
-          quantity: item.quantity,
-          unit: item.product?.unit || '-',
+          product: item.product ?? null,
+          available_quantity: item.available_quantity ?? 0,
+          price_per_unit: item.price_per_unit ?? undefined,
+          final_price: item.final_price ?? undefined
         });
       }
     }

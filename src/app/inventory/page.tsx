@@ -73,7 +73,7 @@ export default async function InventoryPage() {
                      <td className="p-4">{p.unit ?? '-'}</td>
                      <td className="p-4 text-center font-bold">{p.inventory?.[0]?.quantity ?? 0}</td>
                      <td className="p-4">{p.purchase_price ? formatCurrency(p.purchase_price) : '-'}</td>
-                     <td className="p-4 whitespace-nowrap">{p.expiration_date ? formatDate(p.expiration_date) : '-'}</td>
+                     <td className="p-4 whitespace-nowrap">{(p.expiry_date ?? '') !== '' ? formatDate(p.expiry_date) : '-'}</td>
                      <td className="p-4">{p.storage_place ?? '-'}</td>
                      <td className="p-4 text-right whitespace-nowrap">{p.inventory?.[0]?.last_updated_at ? formatDate(p.inventory[0].last_updated_at) : '-'}</td>
                 </tr>

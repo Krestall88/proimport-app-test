@@ -165,7 +165,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                   <td className="p-2 border">{item.product?.description ?? '-'}</td>
                   <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
                   <td className="p-2 border">{item.product?.batch_number ?? '-'}</td>
-                  <td className="p-2 border">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString() : '-'}</td>
+                  <td className="p-2 border">{new Date(item.product.expiry_date || '').toLocaleDateString()}</td>
                   <td className="p-2 border">{item.available_quantity} {item.product?.unit ?? ''}</td>
                   <td className="p-2 border">{formatCurrency(item.purchase_price)}</td>
                   <td className="p-2 border">{formatCurrency(item.final_price)}</td>

@@ -57,7 +57,7 @@ export interface Product {
   selling_price: number | null;
   category: string;
   unit: string;
-  expiry_date?: string | null;
+  expiry_date: string;
   batch_number: string;
   created_at: string;
   supplier_id: string | null;
@@ -155,7 +155,7 @@ export interface ManagerInventoryItem {
 }
 
 export interface ManagerOrderItem {
-  order_id: string;
+  purchase_order_id: string;
   created_at: string;
   shipped_at?: string | null;
   status: string;
@@ -169,7 +169,7 @@ export interface ManagerOrderItem {
 }
 
 export interface WarehouseOrderItem {
-  order_id: string;
+  purchase_order_id: string;
   created_at: string;
   shipped_at?: string | null;
   status: string;
@@ -196,7 +196,7 @@ export interface ManagerGoodsReceipt {
   id: string;
   created_at: string;
   supplier_name: string;
-  po_id: string;
+  purchase_order_id: string;
   status: string;
   notes?: string; 
   description: string; // теперь всегда строка, даже если поле пустое

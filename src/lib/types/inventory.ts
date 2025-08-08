@@ -7,10 +7,10 @@ export interface InventoryProduct {
   available_quantity: number;
   expiry_date?: string | null;
   description: string; // теперь всегда строка, даже если поле пустое
-  batch_number?: string;
-  unit?: string | null;
+  batch_number: string;
+  unit: string;
   final_price: number;
-  category?: string | null;
+  category: string;
 }
 
 // Универсальный тип для wishlist/cart, всегда содержит qty и comment

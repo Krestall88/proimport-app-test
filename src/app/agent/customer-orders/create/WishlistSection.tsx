@@ -42,9 +42,9 @@ const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryPro
         expiry_date: null,
         description: '',
         batch_number: '',
-        unit: form.unit ?? '',
+        unit: form.unit || '',
         final_price: 0,
-        category: form.category ?? '',
+        category: form.category || '',
         qty: form.qty,
         comment: form.comment
       };

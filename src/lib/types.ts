@@ -55,10 +55,10 @@ export interface Product {
   description: string; // теперь всегда строка, даже если поле пустое
   purchase_price: number | null;
   selling_price: number | null;
-  category: string | null;
-  unit: string | null;
+  category: string;
+  unit: string;
   expiry_date?: string | null;
-  batch_number?: string | null;
+  batch_number: string;
   created_at: string;
   supplier_id: string | null;
   characteristics?: any;

@@ -15,18 +15,18 @@ export default function ReceiptsWithComments({ receipts }: ReceiptsWithCommentsP
   return (
     <div className="space-y-4 max-h-[400px] overflow-y-auto">
       {receipts.map((receipt) => (
-        <Card key={receipt.item_id}>
+        <Card key={receipt.id}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">{receipt.product_title}</CardTitle>
+            <CardTitle className="text-base">{receipt.description}</CardTitle>
             <CardDescription>
-              Приёмка от {new Date(receipt.receipt_date).toLocaleDateString()} (Заказ #{receipt.purchase_order_id.substring(0, 8)})
+              Приёмка от {new Date(receipt.created_at).toLocaleDateString()} (Заказ #{receipt.purchase_order_id?.substring(0, 8)})
             </CardDescription>
           </CardHeader>
           <CardContent>
             <blockquote className="border-l-2 pl-4 italic">
-              {receipt.comment}
+              {receipt.notes || 'Нет комментариев'}
             </blockquote>
-            <p className="text-xs text-muted-foreground mt-2">Получено: {receipt.quantity_received} шт.</p>
+            <p className="text-xs text-muted-foreground mt-2">Поставщик: {receipt.supplier_name}</p>
           </CardContent>
         </Card>
       ))}

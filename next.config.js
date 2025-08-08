@@ -1,1 +1,3 @@
-module.exports = {};
+const nextConfig = {};
+
+export default nextConfig;

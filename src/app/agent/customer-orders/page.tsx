@@ -93,10 +93,11 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
     customer_payment_terms: item.customer_payment_terms,
     order_item_id: item.order_item_id,
     product: {
-      id: item.product_id || '',
+      // TODO: После доработки view заменить sku на product_id
+      id: item.sku || '', // surrogate, нужен product_id
       title: item.product_title,
       nomenclature_code: item.sku || 'N/A',
-      description: item.description ?? null,
+      description: item.description || '',
       purchase_price: null,
       selling_price: null,
       category: item.category ?? null,

@@ -18,6 +18,7 @@ export async function getManagerCustomerOrders() {
         id,
         quantity,
         price_per_unit,
+        product:products(id, nomenclature_code, title, description),
         inventory_items!inner(
           goods_receipt_items!inner(purchase_price)
         )
@@ -46,11 +47,19 @@ export async function getManagerCustomerOrders() {
 
   const transformedData = data.map(order => ({
     ...order,
-    customer_order_items: order.customer_order_items.map((item: OrderItem) => ({
+    customer_order_items: order.customer_order_items.map((item: any) => ({
       id: item.id,
       quantity: item.quantity,
       price_per_unit: item.price_per_unit,
       purchase_price: item.inventory_items[0]?.goods_receipt_items[0]?.purchase_price || 0,
+      product: item.product
+        ? {
+            id: item.product.id,
+            nomenclature_code: item.product.nomenclature_code,
+            title: item.product.title,
+            description: item.product.description ?? '',
+          }
+        : null // TODO: если product_id отсутствует или не найден, обработать кейс
     })),
   }));
 

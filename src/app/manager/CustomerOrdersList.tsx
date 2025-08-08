@@ -8,7 +8,7 @@ type CustomerOrderWithRelations = CustomerOrder & {
     purchase_price?: number;
     final_price?: number;
     quantity?: number;
-    product?: { title?: string };
+    product?: { id: string; nomenclature_code: string; title?: string; description: string };
   }>;
 };
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,7 +52,7 @@ export default function CustomerOrdersList({ orders }: CustomerOrdersListProps) 
                 <td className="p-2 border">
                   {order.customer_order_items && order.customer_order_items.length > 0 ? (
                     <ul>
-                      {order.customer_order_items.map((item: { product?: { title?: string }; quantity?: number }, idx: number) => (
+                      {order.customer_order_items.map((item: { product?: { id: string; nomenclature_code: string; title?: string; description: string }; quantity?: number }, idx: number) => (
                         <li key={idx}>
                           {item.product?.title ?? 'N/A'} — {item.quantity} шт.
                         </li>

@@ -55,8 +55,8 @@ export default function InventoryTable({ inventory, loading }: InventoryTablePro
         const item = inventory.find(invItem => invItem.id === id);
         return {
           productId: item!.product.title,
-          batchNumber: item!.product.batch_number,
-          expiryDate: item!.product.expiry_date,
+          batchNumber: item!.product.batch_number ?? null,
+          expiryDate: item!.product.expiry_date ?? null,
         };
       });
 

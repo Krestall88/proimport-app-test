@@ -36,7 +36,7 @@ export default async function (props: any) {
   return (
     <div className="w-full px-4 md:px-8">
       <div className="flex items-center mb-6 gap-4">
-        <Link href="/warehouse/pending-shipments" passHref legacyBehavior>
+        <Link href="/warehouse/pending-shipments" passHref>
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
             Назад к заявкам

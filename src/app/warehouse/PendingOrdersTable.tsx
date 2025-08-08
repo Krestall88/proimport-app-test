@@ -4,7 +4,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { PurchaseOrderForDashboard } from '@/lib/types';
+import { PurchaseOrder } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { deletePurchaseOrder } from '@/app/purchase-orders/actions';
 
 interface PendingOrdersTableProps {
-  orders: PurchaseOrderForDashboard[];
+  orders: PurchaseOrder[];
 }
 
 export default function PendingOrdersTable({ orders }: PendingOrdersTableProps) {

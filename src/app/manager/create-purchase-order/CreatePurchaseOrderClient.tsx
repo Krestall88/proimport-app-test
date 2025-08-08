@@ -58,7 +58,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     return allProducts.filter(
       (p) =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+        p.nomenclature_code?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [allProducts, searchTerm]);
 
@@ -163,7 +163,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     const product: Product = {
       id: newProduct.id,
       title: newProduct.title,
-      sku: newProduct.sku ?? newProduct.nomenclature_code ?? '',
+      nomenclature_code: newProduct.nomenclature_code ?? '',
       description: newProduct.description ?? '',
       purchase_price: newProduct.purchase_price ?? 0,
       selling_price: newProduct.selling_price ?? 0,
@@ -205,7 +205,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
               {filteredProducts.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.title}</TableCell>
-                  <TableCell>{p.sku}</TableCell>
+                  <TableCell>{p.nomenclature_code}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => addToCart(p)}>
                       Добавить
@@ -233,7 +233,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="font-medium">{ci.product.title}</p>
-                        <p className="text-xs text-muted-foreground">{ci.product.sku}</p>
+                        <p className="text-xs text-muted-foreground">{ci.product.nomenclature_code}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -269,11 +269,11 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`sku-${ci.product.id}`}>Артикул</Label>
+                            <Label htmlFor={`nomenclature_code-${ci.product.id}`}>Артикул</Label>
                             <Input
-                              id={`sku-${ci.product.id}`}
-                              value={ci.product.sku}
-                              onChange={(e) => updateProductField(ci.product.id, 'sku', e.target.value)}
+                              id={`nomenclature_code-${ci.product.id}`}
+                              value={ci.product.nomenclature_code}
+                              onChange={(e) => updateProductField(ci.product.id, 'nomenclature_code', e.target.value)}
                               className="w-full"
                             />
                           </div>
@@ -281,7 +281,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                             <Label htmlFor={`batch_number-${ci.product.id}`}>Партия</Label>
                             <Input
                               id={`batch_number-${ci.product.id}`}
-                              value={ci.product.batch_number}
+                              value={ci.product.batch_number ?? ''}
                               onChange={(e) => updateProductField(ci.product.id, 'batch_number', e.target.value)}
                               className="w-full"
                             />
@@ -291,7 +291,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                             <Input
                               id={`expiry_date-${ci.product.id}`}
                               type="date"
-                              value={ci.product.expiry_date}
+                              value={ci.product.expiry_date ?? ''}
                               onChange={(e) => updateProductField(ci.product.id, 'expiry_date', e.target.value)}
                               className="w-full"
                             />

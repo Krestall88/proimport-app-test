@@ -8,35 +8,7 @@ import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { deleteOrderItem, deleteOrderItems } from './actions';
 import { toast } from 'sonner';
 
-interface ManagerOrderItem {
-  order_id: string;
-  created_at: string;
-  shipped_at?: string | null;
-  status: string;
-  customer_name: string;
-  customer_contacts?: {
-    phone?: string | null;
-    email?: string | null;
-  } | null;
-  customer_tin?: string;
-  customer_kpp?: string;
-  customer_delivery_address?: string;
-  customer_payment_terms?: string;
-  order_item_id: string;
-  product: {
-    title: string;
-    description?: string | null;
-    sku?: string;
-    category?: string;
-    expiry_date?: string | null;
-    batch_number?: string | null;
-    unit?: string | null;
-  };
-  available_quantity: number;
-  final_price: number;
-  purchase_price: number;
-  item_total: number;
-}
+import type { ManagerOrderItem } from '@/lib/types';
 
 interface ManagerOrdersTableProps {
   orders: ManagerOrderItem[];
@@ -191,7 +163,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                   </td>
                   <td className="p-2 border">{item.product?.title ?? '-'}</td>
                   <td className="p-2 border">{item.product?.description ?? '-'}</td>
-                  <td className="p-2 border">{item.product?.sku ?? '-'}</td>
+                  <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
                   <td className="p-2 border">{item.product?.batch_number ?? '-'}</td>
                   <td className="p-2 border">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString() : '-'}</td>
                   <td className="p-2 border">{item.available_quantity} {item.product?.unit ?? ''}</td>

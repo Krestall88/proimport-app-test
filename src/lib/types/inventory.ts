@@ -3,7 +3,7 @@
 export interface InventoryProduct {
   product_id: string;
   title: string; // вместо name
-  sku: string;
+  nomenclature_code: string;
   available_quantity: number;
   expiry_date?: string | null;
   description?: string | null;
@@ -20,4 +20,3 @@ export interface WishlistItem extends InventoryProduct {
   // Для совместимости с продуктами, где используется product_name
   product_name?: string;
 }
-

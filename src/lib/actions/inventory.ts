@@ -7,7 +7,7 @@ export interface InventoryItem {
   product_id: string;
   product: {
     title: string;
-    sku: string;
+    nomenclature_code: string;
     batch_number: string;
     expiry_date: string;
     unit: string;
@@ -41,7 +41,7 @@ export async function getInventoryWithReservations(): Promise<InventoryItem[]> {
     product_id: item.product_id,
     product: {
       title: item.product_name,
-      sku: item.sku,
+      nomenclature_code: item.nomenclature_code ?? '',
       batch_number: item.batch_number,
       expiry_date: item.expiry_date,
       unit: item.unit,

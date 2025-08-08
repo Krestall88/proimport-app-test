@@ -98,7 +98,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       }))
       .filter(p => p.available_quantity > 0 && 
         ((p.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-         (p.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
+         (p.nomenclature_code ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
       );
     
     // DEBUG: Проверим, приходят ли данные с final_price
@@ -283,7 +283,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
                   <TableRow key={product.product_id}>
                     <TableCell className="font-medium">{product.title}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{product.description}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
+                    <TableCell>{product.nomenclature_code}</TableCell>
                     <TableCell>{product.batch_number || '-'}</TableCell>
                     <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : '-'}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>

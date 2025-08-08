@@ -44,19 +44,26 @@ export interface Supplier {
     phone?: string | null;
     email?: string | null;
   } | null;
+  tin?: string | null;
 }
 
 
 export interface Product {
   id: string;
-  title: string; // Единое поле для наименования
-  nomenclature_code: string; // Артикул/код
+  title: string; // Наименование
+  nomenclature_code: string; // Артикул/код (единый идентификатор)
   description: string | null;
-  purchase_price: number;
-  selling_price: number;
+  purchase_price: number | null;
+  selling_price: number | null;
   category: string | null;
   unit: string | null;
-  sku?: string; // Если используется
+  expiry_date?: string | null;
+  batch_number?: string | null;
+  created_at: string;
+  supplier_id: string | null;
+  characteristics?: any;
+  available_quantity?: number;
+  // sku убран как основной идентификатор, используйте nomenclature_code
 }
 
 
@@ -66,7 +73,7 @@ export interface Product {
 
 // --- Purchase Orders ---
 
-export type PurchaseOrderStatus = 'pending' | 'completed' | 'cancelled';
+export type PurchaseOrderStatus = 'pending' | 'completed' | 'cancelled' | 'ordered' | 'in_transit' | 'received';
 
 export type ProductInfo = {
   nomenclature_code: string;
@@ -74,7 +81,6 @@ export type ProductInfo = {
   unit: string;
   description?: string | null;
   category?: string | null;
-  sku?: string;
 };
 
 export type PurchaseOrderItem = {
@@ -83,7 +89,7 @@ export type PurchaseOrderItem = {
   product_id: string;
   quantity_ordered: number;
   price_per_unit?: number;
-  product?: Product | null; // join по product_id
+  product?: Product | null; // join по product_id (унифицированный тип)
 };
 
 export type PurchaseOrder = {
@@ -101,15 +107,7 @@ export type PurchaseOrder = {
 export interface BatchInventoryItem {
   id?: string;
   product_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number: string;
-    expiry_date: string | null;
-    unit: string | null;
-    category: string | null;
-    description: string | null;
-  };
+  product: Product; // Используем единый тип Product с расширенным набором полей
   available_quantity: number;
   purchase_price?: number;
   final_price?: number;
@@ -127,15 +125,7 @@ export type GoodsReceiptStatus = 'in_progress' | 'completed';
 export interface InventoryItem {
   id?: string;
   product_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number?: string;
-    expiry_date?: string | null;
-    unit?: string | null;
-    category?: string | null;
-    description?: string | null;
-  };
+  product: Product; // Используем единый тип Product с расширенным набором полей
   available_quantity: number;
   purchase_price?: number;
   final_price?: number;
@@ -155,15 +145,7 @@ export interface InventoryItem {
 export interface ManagerInventoryItem {
   id: string;
   product_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number: string;
-    expiry_date: string | null;
-    unit: string | null;
-    category: string | null;
-    description: string | null;
-  };
+  product: Product; // Используем единый тип Product с расширенным набором полей
   available_quantity: number;
   purchase_price: number;
   final_price: number;
@@ -179,15 +161,7 @@ export interface ManagerOrderItem {
   status: string;
   customer_name: string;
   order_item_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number?: string | null;
-    expiry_date?: string | null;
-    unit?: string | null;
-    category?: string | null;
-    description?: string | null;
-  };
+  product: Product; // Используем единый тип Product с расширенным набором полей
   available_quantity: number;
   purchase_price: number;
   final_price: number;
@@ -212,15 +186,7 @@ export interface WarehouseOrderItem {
     payment_terms?: string;
   } | null;
   order_item_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number?: string | null;
-    expiry_date?: string | null;
-    unit?: string | null;
-    category?: string | null;
-    description?: string | null;
-  };
+  product: Product; // Используем единый тип Product с расширенным набором полей
   available_quantity: number;
   price_per_unit?: number;
   final_price?: number;

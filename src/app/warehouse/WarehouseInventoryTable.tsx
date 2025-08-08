@@ -37,10 +37,10 @@ export default function WarehouseInventoryTable({ inventory }: WarehouseInventor
       </TableHeader>
       <TableBody>
         {inventory.map((item, idx) => (
-          <TableRow key={item.product.sku + '_' + idx}>
+          <TableRow key={item.product.nomenclature_code + '_' + idx}>
             <TableCell className="font-medium">{item.product?.title ?? '-'}</TableCell>
             <TableCell>{item.product?.description ?? '-'}</TableCell>
-            <TableCell>{item.product?.sku ?? '-'}</TableCell>
+            <TableCell>{item.product?.nomenclature_code ?? '-'}</TableCell>
             <TableCell>{item.product?.category ?? '-'}</TableCell>
             <TableCell>{item.product?.batch_number ?? '-'}</TableCell>
             <TableCell>{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString() : '-'}</TableCell>

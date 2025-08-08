@@ -1,22 +1,20 @@
 'use client';
 
-import { GoodsReceiptForDashboard } from '@/lib/types';
+import { ManagerGoodsReceipt } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 interface ActiveReceiptsTableProps {
-  receipts: GoodsReceiptForDashboard[];
+  receipts: ManagerGoodsReceipt[];
 }
 
 export default function ActiveReceiptsTable({ receipts }: ActiveReceiptsTableProps) {
   const router = useRouter();
 
   const handleContinueReceiving = (receiptId: string) => {
-    // TODO: Implement navigation to continue this specific receipt process
-    console.log(`Navigating to continue receiving for receipt ${receiptId}`);
-    // router.push(`/warehouse/receiving/continue/${receiptId}`);
+    router.push(`/warehouse/receiving/continue/${receiptId}`);
   };
 
   return (

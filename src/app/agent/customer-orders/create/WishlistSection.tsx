@@ -37,7 +37,7 @@ const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryPro
       newItem = {
         product_id: '',
         title: form.title,
-        sku: '',
+        nomenclature_code: '',
         available_quantity: 0,
         expiry_date: null,
         description: '',

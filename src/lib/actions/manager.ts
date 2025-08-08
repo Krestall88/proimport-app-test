@@ -28,7 +28,7 @@ export async function getInventoryForManager(): Promise<ManagerInventoryItem[]> 
     product_id: item.product_id,
     product: {
       title: item.product_name,
-      sku: item.sku,
+      nomenclature_code: item.nomenclature_code ?? '',
       batch_number: item.batch_number,
       expiry_date: item.expiry_date,
       unit: item.unit,
@@ -130,23 +130,21 @@ export async function getCustomers(): Promise<CustomerInfo[]> {
   return data || [];
 }
 
-/**
- * TODO: Функция для создания нового заказа на поставку
- */
 export async function createPurchaseOrder(data: any) {
-  console.log('Creating new purchase order...', data);
+  // TODO: Реализовать реальное создание заказа через Supabase
+  // Пока что возвращаем успешный результат для теста UI
   return { success: true, message: 'Заказ на поставку создан (моделирование).' };
 }
 
 // --- Analytics Actions ---
 
-import { PurchaseOrderForDashboard } from '@/lib/types';
+
 
 /**
  * Fetches pending purchase orders for the manager's dashboard.
  * Uses the `purchase_orders_for_dashboard` view.
  */
-export async function getPurchaseOrdersForManager(): Promise<PurchaseOrderForDashboard[]> {
+export async function getPurchaseOrdersForManager(): Promise<PurchaseOrder[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -160,7 +158,7 @@ export async function getPurchaseOrdersForManager(): Promise<PurchaseOrderForDas
     return [];
   }
 
-  return data as PurchaseOrderForDashboard[];
+  return data as PurchaseOrder[];
 }
 
 // --- Analytics Actions ---

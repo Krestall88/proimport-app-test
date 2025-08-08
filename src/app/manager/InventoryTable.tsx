@@ -140,7 +140,7 @@ export default function InventoryTable({ inventory, loading }: InventoryTablePro
                     aria-label={`Выбрать строку ${item.id}`}
                   />
                 </TableCell>
-                <TableCell>{item.product?.sku ?? '-'}</TableCell>
+                <TableCell>{item.product?.nomenclature_code ?? '-'}</TableCell>
                 <TableCell className="font-medium">{item.product?.title ?? '-'}</TableCell>
                 <TableCell>{item.product?.description ?? '-'}</TableCell>
                 <TableCell>{item.product?.category ?? '-'}</TableCell>

@@ -98,7 +98,7 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
     product_id: item.product_id,
     product: {
       title: item.product_name,
-      sku: item.sku,
+      nomenclature_code: item.nomenclature_code ?? '',
       batch_number: item.batch_number,
       expiry_date: item.expiry_date,
       unit: item.unit,

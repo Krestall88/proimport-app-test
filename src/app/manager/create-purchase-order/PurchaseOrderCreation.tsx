@@ -76,7 +76,7 @@ export default function PurchaseOrderCreation() {
       } else {
         setProducts((data ?? []).map((p: any) => ({
   ...p,
-  sku: p.sku ?? p.nomenclature_code ?? ''
+  nomenclature_code: p.nomenclature_code ?? ''
 })) as Product[]);
       }
     };
@@ -218,7 +218,7 @@ export default function PurchaseOrderCreation() {
                       const sum = qty * price;
                       return (
                         <TableRow key={item.id}>
-                          <TableCell>{item.sku || '-'}</TableCell>
+                          <TableCell>{item.nomenclature_code || '-'}</TableCell>
                           <TableCell className="font-medium">{item.title}</TableCell>
                           {(() => {
   const freshProduct = products.find(p => p.id === item.id) || item;

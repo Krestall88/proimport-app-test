@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 
-type CartItem = { product: Product; qty: number };
+type CartItem = { product: Product; qty: number; editing?: boolean };
 
 interface Props {
   products: Product[];
@@ -70,24 +70,22 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
         return prev;
       }
       toast.success(`${p.title} добавлен в корзину.`);
-      return [...prev, { product: p, qty: 1 }];
+      return [...prev, { product: p, qty: 1, editing: false }];
     });
   };
 
   const startEditing = (product: Product) => {
     setEditingProduct(product);
-    setCart((prev) => 
-      prev.map((item) => 
-        item
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.id === product.id ? { ...item, editing: true } : item
       )
     );
   };
 
-  const stopEditing = () => {
+  const handleCancelEdit = () => {
     setEditingProduct(null);
-    setCart((prev) => 
-      prev.map((item) => item)
-    );
+    setCart((prev) => prev.map((item) => ({ ...item, editing: false })));
   };
 
   const updateProductField = async (productId: string, field: keyof Product, value: any) => {
@@ -103,19 +101,17 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     }
 
     // Обновляем все места, где используется этот товар
-    setCart((prev) => 
-      prev.map((item) => 
+    setCart((prev) =>
+      prev.map((item) =>
         item.product.id === productId ? { ...item, product: { ...item.product, [field]: value } } : item
       )
     );
-    setAllProducts((prev) => 
-      prev.map((p) => 
-        p.id === productId ? { ...p, [field]: value } : p
-      )
+    setAllProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, [field]: value } : p))
     );
 
     toast.success('Товар успешно обновлен!');
-    stopEditing();
+    handleCancelEdit();
   };
 
   const updateQty = (id: string, qty: number) => {

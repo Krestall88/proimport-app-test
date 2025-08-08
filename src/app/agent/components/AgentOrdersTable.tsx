@@ -22,14 +22,16 @@ interface AgentOrderItem {
   customer_delivery_address?: string;
   customer_payment_terms?: string;
   order_item_id: string;
-  product_title: string;
-  product_description: string;
-  batch_number: string;
-  expiry_date: string;
-  quantity: number;
-  unit?: string | null;
+  product: {
+    title: string;
+    description: string;
+    batch_number: string;
+    expiry_date: string;
+    sku: string;
+    unit?: string | null;
+  };
+  available_quantity: number;
   price_per_unit?: number;
-  sku?: string;
 }
 
 interface AgentOrdersTableProps {
@@ -76,7 +78,7 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
         acc[key] = { ...item, items: [], total_sum: 0 };
       }
       acc[key].items.push(item);
-      acc[key].total_sum += (item.price_per_unit || 0) * item.quantity;
+      acc[key].total_sum += (item.price_per_unit || 0) * item.available_quantity;
       return acc;
     }, {} as Record<string, GroupedOrder>);
     return Object.values(grouped);
@@ -241,14 +243,14 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
                                       checked={selectedRows.includes(item.order_item_id)}
                                     />
                                   </td>
-                                  <td className="p-2 border-r">{item.sku}</td>
-                                  <td className="p-2 border-r">{item.product_title}</td>
-                                  <td className="p-2 border-r text-xs text-gray-400">{item.product_description}</td>
-                                  <td className="p-2 border-r">{item.batch_number}</td>
-                                  <td className="p-2 border-r">{item.expiry_date}</td>
-                                  <td className="p-2 border-r text-center font-bold">{item.quantity} {item.unit || ''}</td>
+                                  <td className="p-2 border-r">{item.product.sku}</td>
+                                  <td className="p-2 border-r">{item.product.title}</td>
+                                  <td className="p-2 border-r text-xs text-gray-400">{item.product.description}</td>
+                                  <td className="p-2 border-r">{item.product.batch_number}</td>
+                                  <td className="p-2 border-r">{item.product.expiry_date}</td>
+                                  <td className="p-2 border-r text-center font-bold">{item.available_quantity} {item.product.unit || ''}</td>
                                   <td className="p-2 border-r text-right">{formatCurrency(item.price_per_unit)}</td>
-                                  <td className="p-2 text-right font-bold">{formatCurrency((item.price_per_unit || 0) * item.quantity)}</td>
+                                  <td className="p-2 text-right font-bold">{formatCurrency((item.price_per_unit || 0) * item.available_quantity)}</td>
                                   <td className="p-2 text-center">
                                     <Button
                                       variant="ghost"

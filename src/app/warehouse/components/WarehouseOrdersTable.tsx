@@ -26,14 +26,16 @@ export interface WarehouseOrderItem {
     payment_terms?: string;
   } | null;
   order_item_id: string;
-  product_title: string;
-  description?: string | null;
-  sku?: string;
-  category?: string;
-  expiry_date?: string | null;
-  batch_number?: string | null;
-  quantity: number;
-  unit?: string | null;
+  product: {
+    title: string;
+    description?: string | null;
+    sku?: string;
+    category?: string;
+    expiry_date?: string | null;
+    batch_number?: string | null;
+    unit?: string | null;
+  };
+  available_quantity: number;
   price_per_unit?: number;
   final_price?: number;
 }
@@ -196,14 +198,14 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                           <tbody>
                             {order.items.map(item => (
                               <tr key={item.order_item_id} className="border-t">
-                                <td className="p-2 border-r">{item.product_title}</td>
-                                <td className="p-2 border-r">{item.description || '-'}</td>
-                                <td className="p-2 border-r">{item.category || '-'}</td>
-                                <td className="p-2 border-r">{item.sku || '-'}</td>
-                                <td className="p-2 border-r">{item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
-                                <td className="p-2 border-r">{item.batch_number || '-'}</td>
-                                <td className="p-2 border-r text-center font-bold">{item.quantity}</td>
-                                <td className="p-2 text-center">{item.unit || '-'}</td>
+                                <td className="p-2 border-r">{item.product.title}</td>
+                                <td className="p-2 border-r">{item.product.description || '-'}</td>
+                                <td className="p-2 border-r">{item.product.category || '-'}</td>
+                                <td className="p-2 border-r">{item.product.sku || '-'}</td>
+                                <td className="p-2 border-r">{item.product.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
+                                <td className="p-2 border-r">{item.product.batch_number || '-'}</td>
+                                <td className="p-2 border-r text-center font-bold">{item.available_quantity}</td>
+                                <td className="p-2 text-center">{item.product.unit || '-'}</td>
                               </tr>
                             ))}
                           </tbody>

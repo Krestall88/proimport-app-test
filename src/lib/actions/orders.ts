@@ -51,7 +51,7 @@ async function getOrders(role: 'agent' | 'owner'): Promise<Order[]> {
       order_items:customer_order_items(
         id,
         quantity,
-        product:products(name),
+        product:products(title, sku, batch_number, expiry_date, unit, category, description),
         goods_receipt_item:goods_receipt_items(price_per_unit, purchase_price_per_unit)
       )
     `)
@@ -73,11 +73,17 @@ async function getOrders(role: 'agent' | 'owner'): Promise<Order[]> {
     customer: order.customer || null,
     order_items: order.order_items.map((item: any) => ({
       id: item.id,
-      product_name: item.product?.name || 'Неизвестный товар',
-      quantity: item.quantity,
-      // Для агента отдаем только цену продажи
+      product: {
+        title: item.product?.title || 'Неизвестный товар',
+        sku: item.product?.sku || '',
+        batch_number: item.product?.batch_number || '',
+        expiry_date: item.product?.expiry_date || '',
+        unit: item.product?.unit || '',
+        category: item.product?.category || '',
+        description: item.product?.description || '',
+      },
+      available_quantity: item.quantity,
       price_per_unit: item.goods_receipt_item?.price_per_unit,
-      // Для руководителя (owner) отдаем и цену закупки
       purchase_price_per_unit: role === 'owner' ? item.goods_receipt_item?.purchase_price_per_unit : undefined,
     })),
   }));

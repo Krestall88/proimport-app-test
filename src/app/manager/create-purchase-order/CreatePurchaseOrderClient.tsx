@@ -45,9 +45,9 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
         console.error('Error fetching suppliers:', error);
       } else if (data) {
         setSuppliers((data ?? []).map((s: any) => ({
-  ...s,
-  contacts: typeof s.contacts === 'object' && s.contacts !== null ? s.contacts : { phone: null, email: null }
-})) as Supplier[]);
+          ...s,
+          contacts: typeof s.contacts === 'object' && s.contacts !== null ? s.contacts : { phone: null, email: null }
+        })) as Supplier[]);
       }
     };
     fetchSuppliers();
@@ -161,18 +161,20 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
 
   const handleProductCreated = (newProduct: NewProduct) => {
     const product: Product = {
-  id: newProduct.id,
-  title: newProduct.title,
-  sku: newProduct.sku ?? newProduct.nomenclature_code ?? '',
-  description: newProduct.description ?? '',
-  purchase_price: newProduct.purchase_price ?? 0,
-  selling_price: newProduct.selling_price ?? 0,
-  category: newProduct.category ?? null,
-  unit: newProduct.unit ?? null,
-};
-setAllProducts((prevProducts) => [...prevProducts, product]);
-// Сразу добавляем новый товар в корзину
-addToCart(product);
+      id: newProduct.id,
+      title: newProduct.title,
+      sku: newProduct.sku ?? newProduct.nomenclature_code ?? '',
+      description: newProduct.description ?? '',
+      purchase_price: newProduct.purchase_price ?? 0,
+      selling_price: newProduct.selling_price ?? 0,
+      category: newProduct.category ?? null,
+      unit: newProduct.unit ?? null,
+      batch_number: newProduct.batch_number ?? '',
+      expiry_date: newProduct.expiry_date ?? '',
+    };
+    setAllProducts((prevProducts) => [...prevProducts, product]);
+    // Сразу добавляем новый товар в корзину
+    addToCart(product);
   };
 
   return (
@@ -272,6 +274,25 @@ addToCart(product);
                               id={`sku-${ci.product.id}`}
                               value={ci.product.sku}
                               onChange={(e) => updateProductField(ci.product.id, 'sku', e.target.value)}
+                              className="w-full"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`batch_number-${ci.product.id}`}>Партия</Label>
+                            <Input
+                              id={`batch_number-${ci.product.id}`}
+                              value={ci.product.batch_number}
+                              onChange={(e) => updateProductField(ci.product.id, 'batch_number', e.target.value)}
+                              className="w-full"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`expiry_date-${ci.product.id}`}>Срок годности</Label>
+                            <Input
+                              id={`expiry_date-${ci.product.id}`}
+                              type="date"
+                              value={ci.product.expiry_date}
+                              onChange={(e) => updateProductField(ci.product.id, 'expiry_date', e.target.value)}
                               className="w-full"
                             />
                           </div>

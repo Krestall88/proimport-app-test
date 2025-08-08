@@ -23,16 +23,18 @@ interface ManagerOrderItem {
   customer_delivery_address?: string;
   customer_payment_terms?: string;
   order_item_id: string;
-  product_title: string;
-  description?: string | null;
-  sku?: string;
-  category?: string;
-  expiry_date?: string | null;
-  batch_number?: string | null;
-  quantity: number;
-  unit?: string | null;
-  purchase_price: number;
+  product: {
+    title: string;
+    description?: string | null;
+    sku?: string;
+    category?: string;
+    expiry_date?: string | null;
+    batch_number?: string | null;
+    unit?: string | null;
+  };
+  available_quantity: number;
   final_price: number;
+  purchase_price: number;
   item_total: number;
 }
 
@@ -187,12 +189,12 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                       {statusMap[item.status] || item.status}
                     </span>
                   </td>
-                  <td className="p-2 border">{item.product_title}</td>
-                  <td className="p-2 border">{item.description || '—'}</td>
-                  <td className="p-2 border">{item.sku || '—'}</td>
-                  <td className="p-2 border">{item.batch_number || '—'}</td>
-                  <td className="p-2 border">{item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : '—'}</td>
-                  <td className="p-2 border">{item.quantity} {item.unit}</td>
+                  <td className="p-2 border">{item.product.title}</td>
+                  <td className="p-2 border">{item.product.description || '—'}</td>
+                  <td className="p-2 border">{item.product.sku || '—'}</td>
+                  <td className="p-2 border">{item.product.batch_number || '—'}</td>
+                  <td className="p-2 border">{item.product.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString() : '—'}</td>
+                  <td className="p-2 border">{item.available_quantity} {item.product.unit}</td>
                   <td className="p-2 border">{formatCurrency(item.purchase_price)}</td>
                   <td className="p-2 border">{formatCurrency(item.final_price)}</td>
                   <td className="p-2 border">{formatCurrency(item.item_total)}</td>

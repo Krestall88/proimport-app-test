@@ -102,7 +102,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
 
   const displayInventory = useMemo(() => {
     const cartQtys: { [key: string]: number } = cart.reduce((acc, item) => {
-      acc[item.product_id] = (acc[item.product_id] || 0) + item.quantity;
+      acc[item.product_id] = (acc[item.product_id] || 0) + item.available_quantity;
       return acc;
     }, {} as { [key: string]: number });
 
@@ -112,8 +112,8 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         available_quantity: p.available_quantity - (cartQtys[p.product_id] || 0),
       }))
       .filter(p => p.available_quantity > 0 && 
-        ((p.product_name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-         (p.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
+        ((p.product.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+         (p.product.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
       );
     
     // DEBUG: Проверим, приходят ли данные с final_price
@@ -134,7 +134,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       if (existingItem) {
         return prevCart.map(item =>
           item.product_id === product.product_id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.available_quantity + quantity }
             : item
         );
       } else {
@@ -176,7 +176,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         // Проверяем, что все элементы корзины имеют корректную цену
         const validatedCart = cart.map(item => ({
           product_id: item.product_id,
-          qty: item.quantity,
+          qty: item.available_quantity,
           final_price: (item.final_price !== undefined && !isNaN(item.final_price)) ? item.final_price : 0,
         }));
         
@@ -212,7 +212,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
   };
 
   const totalAmount = useMemo(() => {
-    return cart.reduce((sum, item) => sum + (item.final_price * item.quantity), 0);
+    return cart.reduce((sum, item) => sum + (item.final_price * item.available_quantity), 0);
   }, [cart]);
 
   const handleWishlistChange = (newWishlist: any[]) => {
@@ -221,7 +221,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
 
   const handleAddWishlistToCart = (item: WishlistItem) => {
     // Найти соответствующий товар в инвентаре
-    const product = displayInventory.find(p => p.product_name === item.product_name);
+    const product = displayInventory.find(p => p.product.title === item.product_name);
     if (product) {
       const quantity = item.qty || 1;
       if (quantity <= product.available_quantity) {
@@ -296,13 +296,13 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {displayInventory.map((product) => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="font-medium">{product.product_name}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{product.description}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
-                    <TableCell>{product.batch_number || '-'}</TableCell>
-                    <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell className="font-medium">{product.product.title}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{product.product.description}</TableCell>
+                    <TableCell>{product.product.sku}</TableCell>
+                    <TableCell>{product.product.batch_number || '-'}</TableCell>
+                    <TableCell>{product.product.expiry_date ? new Date(product.product.expiry_date).toLocaleDateString() : '-'}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>
-                    <TableCell className="text-right">{product.available_quantity} {product.unit}</TableCell>
+                    <TableCell className="text-right">{product.available_quantity} {product.product.unit}</TableCell>
                     <TableCell className="min-w-[120px]">
                       <Input
                         type="number"
@@ -354,10 +354,10 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {cart.map((item) => (
                   <TableRow key={item.product_id}>
-                    <TableCell className="font-medium">{item.product_name}</TableCell>
-                    <TableCell className="text-right">{item.quantity} {item.unit}</TableCell>
+                    <TableCell className="font-medium">{item.product.title}</TableCell>
+                    <TableCell className="text-right">{item.available_quantity} {item.product.unit}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(item.final_price * item.quantity)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.final_price * item.available_quantity)}</TableCell>
                     <TableCell className="text-center">
                       <Button variant="destructive" size="sm" onClick={() => handleRemoveFromCart(item.product_id)}>Удалить</Button>
                     </TableCell>
@@ -372,7 +372,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
             <div className="pt-4 mt-4 border-t">
               <div className="flex justify-between font-bold">
                 <span>Итого</span>
-                <span>{formatCurrency(cart.reduce((acc, item) => acc + item.final_price * item.quantity, 0))}</span>
+                <span>{formatCurrency(cart.reduce((acc, item) => acc + item.final_price * item.available_quantity, 0))}</span>
               </div>
             </div>
             <div className="flex justify-end mt-6">

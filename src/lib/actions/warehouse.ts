@@ -96,16 +96,18 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
   return (data ?? []).map((item: any) => ({
     id: item.id || `${item.product_id}-${item.batch_number}-${item.expiry_date}`,
     product_id: item.product_id,
-    product_name: item.product_name, // название товара
-    sku: item.sku,
-    available_quantity: item.available_quantity, // остаток
+    product: {
+      title: item.product_name,
+      sku: item.sku,
+      batch_number: item.batch_number,
+      expiry_date: item.expiry_date,
+      unit: item.unit,
+      category: item.category,
+      description: item.description || '-',
+    },
+    available_quantity: item.available_quantity,
     purchase_price: item.purchase_price,
     final_price: item.final_price,
-    expiry_date: item.expiry_date,
-    description: item.description || '-',
-    batch_number: item.batch_number,
-    category: item.category,
-    unit: item.unit,
     characteristics: item.characteristics,
     total_received: item.total_received,
     total_reserved: item.total_reserved

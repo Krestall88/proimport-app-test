@@ -49,13 +49,14 @@ export interface Supplier {
 
 export interface Product {
   id: string;
-  title: string;
-  nomenclature_code: string; // соответствует полю nomenclature_code в БД
+  title: string; // Единое поле для наименования
+  nomenclature_code: string; // Артикул/код
   description: string | null;
   purchase_price: number;
   selling_price: number;
   category: string | null;
   unit: string | null;
+  sku?: string; // Если используется
 }
 
 
@@ -73,6 +74,7 @@ export type ProductInfo = {
   unit: string;
   description?: string | null;
   category?: string | null;
+  sku?: string;
 };
 
 export type PurchaseOrderItem = {
@@ -91,116 +93,123 @@ export type PurchaseOrder = {
   supplier_id: string;
   supplier?: Supplier | null; // join по supplier_id
   purchase_order_items: PurchaseOrderItem[];
-};
 
 // --- Goods Receipts ---
 
 // --- Batch Inventory Aggregation ---
 export interface BatchInventoryItem {
+  id?: string;
   product_id: string;
-  batch_number: string;
-  expiry_date: string | null;
-  description: string | null;
+  product: {
+    title: string;
+    sku: string;
+    batch_number: string;
+    expiry_date: string | null;
+    unit: string | null;
+    category: string | null;
+    description: string | null;
+  };
   available_quantity: number;
-  product_name: string;
-  sku: string;
-  price: number;
-  unit: string | null;
-  category: string | null;
+  purchase_price?: number;
+  final_price?: number;
+  total_received?: number;
+  total_reserved?: number;
+  characteristics?: any;
 }
 
 
 export type GoodsReceiptStatus = 'in_progress' | 'completed';
 
-export type ReceiptData = {
-  purchase_order_id: string;
-  status: 'completed' | 'draft';
-  items: {
-    purchase_order_item_id: string;
-    product_id: string; 
-    quantity_received: number;
-    batch_number: string;
-    category: string;
-    unit: string;
-    description: string; 
-    expiry_date: string | null;
-    notes?: string;
-  }[];
-};
-
-export interface GoodsReceiptItem {
-  id: string;
-  goods_receipt_id: string;
-  product_id: string;
-  quantity_received: number;
-  expiry_date: string | null;
-  discrepancy_reason: string | null;
-  notes: string | null;
-  // Joined data for displaying product info
-  products: Pick<Product, 'title' | 'nomenclature_code'> | null;
-}
-
-export interface GoodsReceipt {
-  id: string;
-  created_at: string;
-  purchase_order_id: string;
-  status: GoodsReceiptStatus;
-  notes: string | null;
-  description: string | null;
-  // Joined data for displaying PO and supplier info
-  purchase_orders: {
-    id: string;
-    suppliers: Pick<Supplier, 'name'> | null;
-  } | null;
-  goods_receipt_items: GoodsReceiptItem[];
-}
-
-// --- Types for Warehouse Dashboard ---
-
-export type PurchaseOrderForDashboard = {
-  id: string;
-  created_at: string;
-  expected_delivery_date: string | null;
-  status: PurchaseOrderStatus;
-  suppliers: { name: string | null } | null;
-  item_count: number; 
-  description: string | null;
-};
-
-export type GoodsReceiptForDashboard = {
-  id: string;
-  purchase_order_id: string;
-  status: 'in_progress' | 'completed' | 'cancelled';
-  created_at: string;
-  supplier_name: string | null; 
-  description: string | null;
+{{ ... }}
 }
 
 // --- Inventory ---
 
 export interface InventoryItem {
+  id?: string;
   product_id: string;
-  product_title: string;
-  nomenclature_code: string;
-  quantity_on_hand: number;
-  unit: string | null;
-  location: string | null;
+  product: {
+    title: string;
+    sku: string;
+    batch_number?: string;
+    expiry_date?: string | null;
+    unit?: string | null;
+    category?: string | null;
+    description?: string | null;
+  };
+  available_quantity: number;
+  purchase_price?: number;
+  final_price?: number;
+  total_received?: number;
+  total_reserved?: number;
+  characteristics?: any;
+  location?: string | null;
 }
 
 // --- Types for Detailed Receiving Page ---
 
-export interface PurchaseOrderItemDetails extends PurchaseOrderItem {
-  products: Product | null;
+{{ ... }}
+  } | null;
+  order_item_id: string;
+  product: {
+    title: string;
+    sku: string;
+    batch_number?: string | null;
+    expiry_date?: string | null;
+    unit?: string | null;
+    category?: string | null;
+    description?: string | null;
+  };
+  available_quantity: number;
+  price_per_unit?: number;
+  final_price?: number;
 }
 
-export interface PurchaseOrderDetails extends PurchaseOrder {
-  suppliers: {
-    name: string;
-  };
-  purchase_order_items: PurchaseOrderItemDetails[];
-};
+//==============================================================================
+// Manager Module Types
+//==============================================================================
 
-// --- Types for Warehouse Orders ---
+export interface ManagerInventoryItem {
+  id: string;
+  product_id: string;
+  product: {
+    title: string;
+    sku: string;
+    batch_number: string;
+    expiry_date: string | null;
+    unit: string | null;
+    category: string | null;
+    description: string | null;
+  };
+  available_quantity: number;
+  purchase_price: number;
+  final_price: number;
+  total_received?: number;
+  total_reserved?: number;
+  characteristics?: any;
+}
+
+export interface ManagerOrderItem {
+  order_id: string;
+  created_at: string;
+  shipped_at?: string | null;
+  status: string;
+  customer_name: string;
+  order_item_id: string;
+  product: {
+    title: string;
+    sku: string;
+    batch_number?: string | null;
+    expiry_date?: string | null;
+    unit?: string | null;
+    category?: string | null;
+    description?: string | null;
+  };
+  available_quantity: number;
+  purchase_price: number;
+  final_price: number;
+  item_total: number;
+}
 
 export interface WarehouseOrderItem {
   order_id: string;
@@ -220,55 +229,18 @@ export interface WarehouseOrderItem {
     payment_terms?: string;
   } | null;
   order_item_id: string;
-  product_title: string;
-  description?: string | null;
-  sku?: string;
-  category?: string;
-  expiry_date?: string | null;
-  batch_number?: string | null;
-  quantity: number;
-  unit?: string | null;
+  product: {
+    title: string;
+    sku: string;
+    batch_number?: string | null;
+    expiry_date?: string | null;
+    unit?: string | null;
+    category?: string | null;
+    description?: string | null;
+  };
+  available_quantity: number;
   price_per_unit?: number;
   final_price?: number;
-}
-
-//==============================================================================
-// Manager Module Types
-//==============================================================================
-
-export interface ManagerInventoryItem {
-  id: string;
-  product_id: string;
-  product_title: string;
-  sku: string;
-  quantity: number;
-  purchase_price: number;
-  final_price: number;
-  expiry_date: string | null;
-  description: string | null;
-  batch_number: string;
-  category: string | null;
-  unit: string | null;
-}
-
-export interface ManagerOrderItem {
-  order_id: string;
-  created_at: string;
-  shipped_at?: string | null;
-  status: string;
-  customer_name: string;
-  order_item_id: string;
-  product_title: string;
-  description?: string | null;
-  sku?: string;
-  category?: string;
-  expiry_date?: string | null;
-  batch_number?: string | null;
-  quantity: number;
-  unit?: string | null;
-  purchase_price: number;
-  final_price: number;
-  item_total: number;
 }
 
 export interface ManagerGoodsReceipt {

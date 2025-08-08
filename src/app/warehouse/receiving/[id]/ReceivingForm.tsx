@@ -223,7 +223,7 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
                   <Input
                     id={`description-${item.id}`}
                     placeholder="Описание..."
-                    value={formState[item.id].description || item.product?.description ?? '-' || ''}
+                    value={formState[item.id].description ?? item.product?.description ?? '-'}
                     onChange={e => handleInputChange(item.id, 'description', e.target.value)}
                     disabled={isSubmitting || isRowConfirmed[item.id]}
                     required

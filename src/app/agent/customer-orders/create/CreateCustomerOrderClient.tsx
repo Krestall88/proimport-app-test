@@ -11,19 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2 } from "lucide-react";
 import WishlistSection from "./WishlistSection";
+import type { WishlistItem } from "@/lib/types/inventory";
 
-interface InventoryProduct {
-  product_id: string;
-  product_name: string;
-  sku: string;
-  available_quantity: number;
-  final_price: number;
-  expiry_date?: string | null;
-  description?: string | null;
-  batch_number?: string;
-  unit?: string | null;
-  category?: string;
-}
+import type { InventoryProduct } from "@/lib/types/inventory";
 
 interface Customer {
   id: string;
@@ -42,12 +32,7 @@ interface CartItem extends InventoryProduct {
   quantity: number;
 }
 
-interface WishlistItem {
-  product_name: string;
-  qty: number;
-  unit?: string;
-  comment?: string;
-}
+// Используем общий тип WishlistItem из @/lib/types/inventory
 
 interface CreateCustomerOrderClientProps {
   inventory: InventoryProduct[];
@@ -112,8 +97,8 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         available_quantity: p.available_quantity - (cartQtys[p.product_id] || 0),
       }))
       .filter(p => p.available_quantity > 0 && 
-        ((p.product.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-         (p.product.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
+        ((p.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+         (p.sku ?? '').toLowerCase().includes(searchTerm.toLowerCase()))
       );
     
     // DEBUG: Проверим, приходят ли данные с final_price
@@ -215,13 +200,13 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
     return cart.reduce((sum, item) => sum + (item.final_price * item.available_quantity), 0);
   }, [cart]);
 
-  const handleWishlistChange = (newWishlist: any[]) => {
+  const handleWishlistChange = (newWishlist: WishlistItem[]) => {
     setWishlist(newWishlist);
   };
 
   const handleAddWishlistToCart = (item: WishlistItem) => {
     // Найти соответствующий товар в инвентаре
-    const product = displayInventory.find(p => p.product.title === item.product_name);
+    const product = displayInventory.find(p => p.title === (item.title || item.title));
     if (product) {
       const quantity = item.qty || 1;
       if (quantity <= product.available_quantity) {
@@ -232,15 +217,15 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         };
         handleAddToCart(cartItem);
       } else {
-        toast.error(`Недостаточно товара ${item.product_name} в наличии`);
+        toast.error(`Недостаточно товара ${item.title || item.title} в наличии`);
       }
     } else {
-      toast.error(`Товар ${item.product_name} не найден в остатках`);
+      toast.error(`Товар ${item.title || item.title} не найден в остатках`);
     }
   };
 
-  const handleRemoveFromWishlist = (itemName: string) => {
-    setWishlist(prev => prev.filter(item => item.product_name !== itemName));
+  const handleRemoveFromWishlist = (title: string) => {
+    setWishlist(prev => prev.filter(item => (item.title || item.title) !== title));
   };
 
   return (
@@ -296,13 +281,13 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {displayInventory.map((product) => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="font-medium">{product.product.title}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{product.product.description}</TableCell>
-                    <TableCell>{product.product.sku}</TableCell>
-                    <TableCell>{product.product.batch_number || '-'}</TableCell>
-                    <TableCell>{product.product.expiry_date ? new Date(product.product.expiry_date).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell className="font-medium">{product.title}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{product.description}</TableCell>
+                    <TableCell>{product.sku}</TableCell>
+                    <TableCell>{product.batch_number || '-'}</TableCell>
+                    <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : '-'}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>
-                    <TableCell className="text-right">{product.available_quantity} {product.product.unit}</TableCell>
+                    <TableCell className="text-right">{product.available_quantity} {product.unit}</TableCell>
                     <TableCell className="min-w-[120px]">
                       <Input
                         type="number"
@@ -354,8 +339,8 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {cart.map((item) => (
                   <TableRow key={item.product_id}>
-                    <TableCell className="font-medium">{item.product.title}</TableCell>
-                    <TableCell className="text-right">{item.available_quantity} {item.product.unit}</TableCell>
+                    <TableCell className="font-medium">{item.title || item.title}</TableCell>
+                    <TableCell className="text-right">{item.available_quantity} {item.unit}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.final_price * item.available_quantity)}</TableCell>
                     <TableCell className="text-center">
@@ -391,6 +376,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         <WishlistSection
           disabled={!selectedCustomerId}
           onWishlistChange={handleWishlistChange}
+          inventory={inventory}
         />
       </div>
     </div>

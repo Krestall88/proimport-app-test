@@ -12,3 +12,12 @@ export interface InventoryProduct {
   final_price: number;
   category?: string | null;
 }
+
+// Универсальный тип для wishlist/cart, всегда содержит qty и comment
+export interface WishlistItem extends InventoryProduct {
+  qty: number;
+  comment?: string;
+  // Для совместимости с продуктами, где используется product_name
+  product_name?: string;
+}
+

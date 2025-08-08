@@ -93,6 +93,7 @@ export type PurchaseOrder = {
   supplier_id: string;
   supplier?: Supplier | null; // join по supplier_id
   purchase_order_items: PurchaseOrderItem[];
+};
 
 // --- Goods Receipts ---
 
@@ -120,8 +121,6 @@ export interface BatchInventoryItem {
 
 export type GoodsReceiptStatus = 'in_progress' | 'completed';
 
-{{ ... }}
-}
 
 // --- Inventory ---
 
@@ -147,23 +146,7 @@ export interface InventoryItem {
 }
 
 // --- Types for Detailed Receiving Page ---
-
-{{ ... }}
-  } | null;
-  order_item_id: string;
-  product: {
-    title: string;
-    sku: string;
-    batch_number?: string | null;
-    expiry_date?: string | null;
-    unit?: string | null;
-    category?: string | null;
-    description?: string | null;
-  };
-  available_quantity: number;
-  price_per_unit?: number;
-  final_price?: number;
-}
+// (определения интерфейсов для детальной страницы приёмки должны быть здесь, если нужны)
 
 //==============================================================================
 // Manager Module Types

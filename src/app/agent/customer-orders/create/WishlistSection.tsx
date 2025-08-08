@@ -3,13 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
-export type WishlistItem = {
-  name: string;
-  qty: number;
-  unit?: string;
-  category?: string;
-  comment?: string;
-};
+import type { WishlistItem, InventoryProduct } from "@/lib/types/inventory";
 
 import { useEffect } from "react";
 
@@ -18,8 +12,8 @@ interface WishlistSectionProps {
   onWishlistChange: (wishlist: WishlistItem[]) => void;
 }
 
-const WishlistSection: React.FC<WishlistSectionProps> = ({ disabled, onWishlistChange }) => {
-  const [form, setForm] = useState<WishlistItem>({ name: '', qty: 1, unit: '', category: '', comment: '' });
+const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryProduct[] }> = ({ disabled, onWishlistChange, inventory }) => {
+  const [form, setForm] = useState<{ title: string; qty: number; unit?: string; category?: string; comment?: string }>({ title: '', qty: 1, unit: '', category: '', comment: '' });
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
   useEffect(() => {
@@ -32,9 +26,31 @@ const WishlistSection: React.FC<WishlistSectionProps> = ({ disabled, onWishlistC
   };
 
   const handleAdd = () => {
-    if (!form.name || !form.qty) return;
-    setWishlist((prev) => [...prev, form]);
-    setForm({ name: '', qty: 1, unit: '', category: '', comment: '' });
+    if (!form.title || !form.qty) return;
+    // Найти товар в inventory по title
+    const found = inventory.find(item => item.title === form.title);
+    let newItem: WishlistItem;
+    if (found) {
+      newItem = { ...found, qty: form.qty, comment: form.comment };
+    } else {
+      // Если не найден — создать пустой шаблон с заданным названием
+      newItem = {
+        product_id: '',
+        title: form.title,
+        sku: '',
+        available_quantity: 0,
+        expiry_date: null,
+        description: '',
+        batch_number: '',
+        unit: form.unit ?? '',
+        final_price: 0,
+        category: form.category ?? '',
+        qty: form.qty,
+        comment: form.comment
+      };
+    }
+    setWishlist((prev) => [...prev, newItem]);
+    setForm({ title: '', qty: 1, unit: '', category: '', comment: '' });
   };
 
   const handleRemove = (idx: number) => {
@@ -46,7 +62,7 @@ const WishlistSection: React.FC<WishlistSectionProps> = ({ disabled, onWishlistC
       <div className="flex flex-wrap gap-2 items-end">
         <div>
           <label className="block text-sm">Наименование *</label>
-          <Input name="name" value={form.name} onChange={handleChange} placeholder="Название товара" required disabled={disabled} />
+          <Input name="title" value={form.title} onChange={handleChange} placeholder="Название товара" required disabled={disabled} />
         </div>
         <div>
           <label className="block text-sm">Кол-во *</label>
@@ -81,7 +97,7 @@ const WishlistSection: React.FC<WishlistSectionProps> = ({ disabled, onWishlistC
           <TableBody>
             {wishlist.map((item, idx) => (
               <TableRow key={idx}>
-                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.title}</TableCell>
                 <TableCell>{item.qty}</TableCell>
                 <TableCell>{item.unit || '-'}</TableCell>
                 <TableCell>{item.category || '-'}</TableCell>

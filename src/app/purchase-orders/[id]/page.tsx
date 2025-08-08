@@ -8,9 +8,11 @@ import { PurchaseOrderDetail, PurchaseOrderStatus } from '@/lib/types';
 import { formatCurrency } from '@/app/utils/formatCurrency';
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-const PurchaseOrderPage = async function (props: any) {
+type POItem = PurchaseOrderDetail['items'][number];
+
+async function PurchaseOrderPage(props: any) {
   const { params } = props;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user!.id).single();
@@ -74,7 +76,7 @@ const PurchaseOrderPage = async function (props: any) {
               </tr>
             </thead>
             <tbody>
-              {order.items.map(item => (
+              {order.items.map((item: POItem) => (
                 <tr key={item.id} className="border-b border-gray-700 last:border-b-0">
                   <td className="p-4 font-medium">{item.product.title}</td>
                   <td className="p-4 text-right">{item.quantity}</td>
@@ -87,7 +89,7 @@ const PurchaseOrderPage = async function (props: any) {
         </div>
 
         <div className="mt-6 text-right">
-          <p className="text-lg font-semibold">Итоговая сумма: {formatCurrency(order.items.reduce((acc, item) => acc + item.quantity * item.purchase_price, 0))}</p>
+          <p className="text-lg font-semibold">Итоговая сумма: {formatCurrency(order.items.reduce((acc: number, item: POItem) => acc + item.quantity * item.purchase_price, 0))}</p>
         </div>
 
         {canUpdateStatus && (
@@ -105,7 +107,14 @@ const PurchaseOrderPage = async function (props: any) {
                 ))}
               </select>
               <label className="text-sm md:col-span-1">Факт. количество
-                <input type="number" name="actualQuantity" min="1" step="1" defaultValue={order.quantity} className="mt-1 w-full p-2 rounded bg-gray-700 border border-gray-600" />
+                <input
+                  type="number"
+                  name="actualQuantity"
+                  min="1"
+                  step="1"
+                  defaultValue={order.items.reduce((acc: number, item: POItem) => acc + item.quantity, 0)}
+                  className="mt-1 w-full p-2 rounded bg-gray-700 border border-gray-600"
+                />
               </label>
               <label className="text-sm md:col-span-1">Комментарий
                 <input type="text" name="comment" placeholder="Брак, недостача..." className="mt-1 w-full p-2 rounded bg-gray-700 border border-gray-600" />
@@ -120,3 +129,5 @@ const PurchaseOrderPage = async function (props: any) {
     </div>
   );
 }
+
+export default PurchaseOrderPage;

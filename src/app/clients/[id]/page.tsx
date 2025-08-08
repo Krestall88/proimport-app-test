@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import ClientDetail from './ClientDetail';
 import { getClientById } from '@/app/clients/actions';
 
-export default async function Page(props: any) {
+async function Page(props: any) {
   const { params } = props;
   const supabase = await createClient();
 
@@ -30,3 +30,5 @@ export default async function Page(props: any) {
 
   return <ClientDetail client={client} canEdit={canEdit} />;
 }
+
+export default Page;

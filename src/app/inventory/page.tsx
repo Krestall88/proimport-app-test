@@ -39,6 +39,7 @@ const InventoryPage = async function InventoryPage() {
     return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы &apos;products&apos; и &apos;inventory_items&apos; созданы.</p>;
   }
 
+
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -85,3 +86,5 @@ const InventoryPage = async function InventoryPage() {
     </div>
   );
 }
+
+export default InventoryPage;

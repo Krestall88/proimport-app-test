@@ -19,6 +19,7 @@ interface OrderItem {
   };
 }
 
+
 // Local type for customer to ensure type safety
 interface Customer {
   name: string;
@@ -33,10 +34,12 @@ interface Customer {
   payment_terms?: string;
 }
 
+
 // Local type for agent to ensure type safety
 interface Agent {
   full_name: string;
 }
+
 
 async function AgentCustomerOrderPage(props: any) {
   const { params } = props;
@@ -63,6 +66,7 @@ async function AgentCustomerOrderPage(props: any) {
   if (error || !order) {
     notFound();
   }
+
 
   const isManager = userRole === 'warehouse_manager';
   const isDriver = userRole === 'driver';
@@ -124,6 +128,7 @@ async function AgentCustomerOrderPage(props: any) {
                   <td className="p-4 text-right">{formatCurrency(item.quantity * item.price_per_unit)}</td>
                 </tr>
               ))}
+
             </tbody>
           </table>
         </div>
@@ -140,11 +145,13 @@ async function AgentCustomerOrderPage(props: any) {
               <select 
                 name="status"
                 defaultValue={order.status}
+
                 className="p-2 rounded bg-gray-700 border border-gray-600 focus:ring-blue-500 focus:border-blue-500"
               >
                 {availableStatuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
+
               </select>
               <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                 Обновить
@@ -152,6 +159,7 @@ async function AgentCustomerOrderPage(props: any) {
             </form>
           </div>
         )}
+
 
         {isDriver && order.status === 'shipped' && (
           <div className="mt-8 border-t border-gray-700 pt-6">
@@ -181,6 +189,7 @@ async function AgentCustomerOrderPage(props: any) {
           </div>
         )}
 
+
         {canCreateInvoice && (
   <div className="mt-8 border-t border-gray-700 pt-6">
     <h3 className="font-semibold text-lg mb-4">Действия бухгалтера</h3>
@@ -189,7 +198,10 @@ async function AgentCustomerOrderPage(props: any) {
     </div>
   </div>
 )}
+
       </div>
     </div>
   );
 }
+
+export default AgentCustomerOrderPage;

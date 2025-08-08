@@ -124,3 +124,5 @@ const InvoicePage = async function (props: any) {
     </div>
   );
 }
+
+export default InvoicePage;

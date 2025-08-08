@@ -92,3 +92,4 @@ const ClientsPage = async function (props: any) {
     </div>
   );
 }
+export default ClientsPage;

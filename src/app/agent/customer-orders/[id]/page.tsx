@@ -38,7 +38,7 @@ interface Agent {
   full_name: string;
 }
 
-const AgentCustomerOrderPage = async function (props: any) {
+async function AgentCustomerOrderPage(props: any) {
   const { params } = props;
   const supabase = await createClient();
 

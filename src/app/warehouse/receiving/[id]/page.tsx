@@ -57,3 +57,5 @@ const WarehouseReceivingPage = async function (props: any) {
     </div>
   );
 }
+
+export default WarehouseReceivingPage;

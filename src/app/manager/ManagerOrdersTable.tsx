@@ -123,7 +123,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
               <th className="p-2 border">Статус</th>
               <th className="p-2 border">Товар</th>
               <th className="p-2 border">Описание</th>
-              <th className="p-2 border">SKU</th>
+              <th className="p-2 border">Номенклатурный код</th>
               <th className="p-2 border">Партия</th>
               <th className="p-2 border">Срок годности</th>
               <th className="p-2 border">Кол-во</th>
@@ -161,7 +161,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                       {statusMap[item.status] || item.status}
                     </span>
                   </td>
-                  <td className="p-2 border">{item.product?.title ?? '-'}</td>
+                  <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
                   <td className="p-2 border">{item.product?.description ?? '-'}</td>
                   <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
                   <td className="p-2 border">{item.product?.batch_number ?? '-'}</td>

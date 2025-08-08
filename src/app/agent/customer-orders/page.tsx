@@ -73,21 +73,7 @@ export interface AgentOrderItem {
   customer_delivery_address?: string;
   customer_payment_terms?: string;
   order_item_id: string;
-  product: {
-    nomenclature_code: string;
-    title: string;
-    description: string;
-    batch_number: string;
-    expiry_date: string;
-    unit?: string | null;
-    category?: string | null;
-    purchase_price?: number | null;
-    selling_price?: number | null;
-    created_at?: string;
-    supplier_id?: string | null;
-    characteristics?: any;
-    available_quantity?: number;
-  };
+  product: import('@/lib/types').Product;
   available_quantity: number;
   price_per_unit?: number;
 }
@@ -107,15 +93,16 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
     customer_payment_terms: item.customer_payment_terms,
     order_item_id: item.order_item_id,
     product: {
-      nomenclature_code: item.sku || 'N/A', // nomenclature_code = sku в исходных данных
+      id: item.product_id || '',
       title: item.product_title,
-      description: item.description || '',
-      batch_number: item.batch_number || 'N/A',
-      expiry_date: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A',
-      unit: item.unit || '',
-      category: item.category || '',
+      nomenclature_code: item.sku || 'N/A',
+      description: item.description ?? null,
       purchase_price: null,
       selling_price: null,
+      category: item.category ?? null,
+      unit: item.unit ?? null,
+      expiry_date: item.expiry_date ?? null,
+      batch_number: item.batch_number ?? null,
       created_at: item.created_at || '',
       supplier_id: null,
       characteristics: null,

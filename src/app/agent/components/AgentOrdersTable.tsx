@@ -8,6 +8,15 @@ import { deleteOrderItems, deleteEntireOrder } from '../customer-orders/actions'
 import { toast } from 'sonner';
 import { type CheckedState } from "@radix-ui/react-checkbox";
 
+interface Product {
+  title: string;
+  description: string;
+  batch_number: string;
+  expiry_date: string;
+  nomenclature_code: string;
+  unit?: string | null;
+}
+
 interface AgentOrderItem {
   order_id: string;
   created_at: string;
@@ -27,7 +36,7 @@ interface AgentOrderItem {
     description: string;
     batch_number: string;
     expiry_date: string;
-    sku: string;
+    nomenclature_code: string;
     unit?: string | null;
   };
   available_quantity: number;
@@ -243,7 +252,7 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
                                       checked={selectedRows.includes(item.order_item_id)}
                                     />
                                   </td>
-                                  <td className="p-2 border-r">{item.product?.sku ?? '-'}</td>
+                                  <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
                                   <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
                                   <td className="p-2 border-r text-xs text-gray-400">{item.product?.description ?? '-'}</td>
                                   <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>

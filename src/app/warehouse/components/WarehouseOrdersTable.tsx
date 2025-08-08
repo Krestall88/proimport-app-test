@@ -27,9 +27,8 @@ export interface WarehouseOrderItem {
   } | null;
   order_item_id: string;
   product: {
-    title: string;
+    nomenclature_code: string;
     description?: string | null;
-    sku?: string;
     category?: string;
     expiry_date?: string | null;
     batch_number?: string | null;
@@ -198,10 +197,10 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                           <tbody>
                             {order.items.map(item => (
                               <tr key={item.order_item_id} className="border-t">
-                                <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.description ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.category ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product?.sku ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
                                 <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>
                                 <td className="p-2 border-r text-center font-bold">{item.available_quantity}</td>

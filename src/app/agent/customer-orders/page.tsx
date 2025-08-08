@@ -73,21 +73,21 @@ export interface AgentOrderItem {
   customer_delivery_address?: string;
   customer_payment_terms?: string;
   order_item_id: string;
-  product_title: string;
-  product_description: string;
-  sku: string;
-  batch_number: string;
-  expiry_date: string;
-  quantity: number;
-  unit: string;
-  price_per_unit: number;
+  product: {
+    title: string;
+    description: string;
+    batch_number: string;
+    expiry_date: string;
+    sku: string;
+    unit?: string | null;
+  };
+  available_quantity: number;
+  price_per_unit?: number;
 }
 
 // Функция-адаптер для преобразования данных
 const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] => {
   if (!dbOrders) return [];
-  
-  // Преобразуем данные из представления в формат, ожидаемый AgentOrdersTable
   return dbOrders.map(item => ({
     order_id: item.order_id,
     created_at: item.created_at,
@@ -99,13 +99,15 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
     customer_delivery_address: item.customer_delivery_address,
     customer_payment_terms: item.customer_payment_terms,
     order_item_id: item.order_item_id,
-    product_title: item.product_title,
-    product_description: item.description || '',
-    sku: item.sku || 'N/A',
-    batch_number: item.batch_number || 'N/A',
-    expiry_date: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A',
-    quantity: item.quantity,
-    unit: item.unit || '',
+    product: {
+      title: item.product_title,
+      description: item.description || '',
+      batch_number: item.batch_number || 'N/A',
+      expiry_date: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A',
+      sku: item.sku || 'N/A',
+      unit: item.unit || '',
+    },
+    available_quantity: item.quantity,
     price_per_unit: item.final_price || 0,
   }));
 };

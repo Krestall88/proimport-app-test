@@ -243,12 +243,12 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
                                       checked={selectedRows.includes(item.order_item_id)}
                                     />
                                   </td>
-                                  <td className="p-2 border-r">{item.product.sku}</td>
-                                  <td className="p-2 border-r">{item.product.title}</td>
-                                  <td className="p-2 border-r text-xs text-gray-400">{item.product.description}</td>
-                                  <td className="p-2 border-r">{item.product.batch_number}</td>
-                                  <td className="p-2 border-r">{item.product.expiry_date}</td>
-                                  <td className="p-2 border-r text-center font-bold">{item.available_quantity} {item.product.unit || ''}</td>
+                                  <td className="p-2 border-r">{item.product?.sku ?? '-'}</td>
+                                  <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
+                                  <td className="p-2 border-r text-xs text-gray-400">{item.product?.description ?? '-'}</td>
+                                  <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>
+                                  <td className="p-2 border-r">{item.product?.expiry_date ?? '-'}</td>
+                                  <td className="p-2 border-r text-center font-bold">{item.available_quantity} {item.product?.unit ?? ''}</td>
                                   <td className="p-2 border-r text-right">{formatCurrency(item.price_per_unit)}</td>
                                   <td className="p-2 text-right font-bold">{formatCurrency((item.price_per_unit || 0) * item.available_quantity)}</td>
                                   <td className="p-2 text-center">

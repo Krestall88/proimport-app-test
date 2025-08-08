@@ -52,7 +52,7 @@ export interface Product {
   id: string;
   title: string; // Наименование
   nomenclature_code: string; // Артикул/код (единый идентификатор)
-  description: string | null;
+  description: string; // теперь всегда строка, даже если поле пустое
   purchase_price: number | null;
   selling_price: number | null;
   category: string | null;
@@ -79,7 +79,7 @@ export type ProductInfo = {
   nomenclature_code: string;
   title: string;
   unit: string;
-  description?: string | null;
+  description: string; // теперь всегда строка, даже если поле пустое
   category?: string | null;
 };
 
@@ -199,7 +199,7 @@ export interface ManagerGoodsReceipt {
   po_id: string;
   status: string;
   notes?: string; 
-  description: string | null;
+  description: string; // теперь всегда строка, даже если поле пустое
 }
 
 // 
@@ -333,5 +333,5 @@ export interface Invoice {
   due_date: string;
   total_amount: number;
   status: InvoiceStatus;
-  description: string | null;
+  description: string; // теперь всегда строка, даже если поле пустое
 }

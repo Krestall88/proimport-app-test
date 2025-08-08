@@ -103,7 +103,7 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
       expiry_date: item.expiry_date,
       unit: item.unit,
       category: item.category,
-      description: item.description || '-',
+      description: item.product?.description,
     },
     available_quantity: item.available_quantity,
     purchase_price: item.purchase_price,

@@ -43,7 +43,7 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
       quantity_received: item.quantity_ordered || '',
       batch_number: '',
       expiry_date: '',
-      description: item.product?.description ?? '-' ?? '',
+      description: item.product.description,
       notes: '',
       nomenclature_code: item.product?.nomenclature_code ?? '-' ?? '',
       title: item.product?.title ?? '-' ?? '',

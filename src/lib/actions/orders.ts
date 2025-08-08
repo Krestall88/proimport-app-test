@@ -80,7 +80,7 @@ async function getOrders(role: 'agent' | 'owner'): Promise<Order[]> {
         expiry_date: item.product?.expiry_date || '',
         unit: item.product?.unit || '',
         category: item.product?.category || '',
-        description: item.product?.description || '',
+        description: item.product?.description,
       },
       available_quantity: item.quantity,
       price_per_unit: item.goods_receipt_item?.price_per_unit,

@@ -33,7 +33,7 @@ export async function getInventoryForManager(): Promise<ManagerInventoryItem[]> 
       expiry_date: item.expiry_date,
       unit: item.unit,
       category: item.category,
-      description: item.description || '-',
+      description: item.description,
     },
     available_quantity: item.available_quantity,
     purchase_price: item.purchase_price,

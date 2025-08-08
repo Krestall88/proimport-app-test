@@ -312,9 +312,7 @@ export type FinancialOrderItem = {
   id: string; // id of the customer_order_item
   quantity: number;
   price_per_unit: number;
-  products: {
-    title: string;
-  } | null;
+  product: Product | null;
   customer_orders: {
     id: string; // id of the customer_order
     created_at: string;

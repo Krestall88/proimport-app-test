@@ -23,7 +23,7 @@ export default async function InventoryPage() {
       id,
       name,
       description,
-      sku,
+      nomenclature_code,
       category,
       unit,
       purchase_price,
@@ -67,7 +67,7 @@ export default async function InventoryPage() {
             <tbody>
                 {products?.map((p: any) => (
                 <tr key={p.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                    <td className="p-4">{p.sku ?? '-'}</td>
+                    <td className="p-4">{p.nomenclature_code ?? '-'}</td>
                      <td className="p-4 font-medium">{p.name ?? 'N/A'}</td>
                      <td className="p-4">{p.category ?? '-'}</td>
                      <td className="p-4">{p.unit ?? '-'}</td>

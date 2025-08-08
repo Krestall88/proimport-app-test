@@ -57,8 +57,8 @@ export interface Product {
   selling_price: number | null;
   category: string;
   unit: string;
-  expiry_date: string;
-  batch_number: string;
+  expiry_date?: string;
+  batch_number?: string;
   created_at: string;
   supplier_id: string | null;
   characteristics?: any;

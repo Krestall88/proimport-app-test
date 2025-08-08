@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
-type Product = { id: string; title: string; purchase_price: number | null };
+import { Product } from '@/lib/types';
 type Supplier = { id: string; name: string };
 
 export default function CreatePurchaseOrderPage() {
@@ -24,7 +24,7 @@ export default function CreatePurchaseOrderPage() {
     async function fetchData() {
       const { data: productsData } = await supabase.from('products').select('id, title, purchase_price');
       const { data: suppliersData } = await supabase.from('suppliers').select('id, name');
-      if (productsData) setProducts(productsData as Product[]);
+      if (productsData) setProducts((productsData as any[]).map(p => ({ ...p, description: p.description ?? '' })) as Product[]);
       if (suppliersData) setSuppliers(suppliersData as Supplier[]);
     }
     fetchData();

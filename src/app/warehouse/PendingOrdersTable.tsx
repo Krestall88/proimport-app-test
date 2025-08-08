@@ -64,9 +64,9 @@ export default function PendingOrdersTable({ orders }: PendingOrdersTableProps) 
         <TableBody>
           {orders.map((order) => (
             <TableRow key={order.id}>
-              <TableCell className="font-medium">{order.suppliers?.name ?? 'N/A'}</TableCell>
+              <TableCell className="font-medium">{order.supplier?.name ?? 'N/A'}</TableCell>
               <TableCell>{order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : 'Не указана'}</TableCell>
-              <TableCell className="text-center">{order.item_count}</TableCell>
+              <TableCell className="text-center">{order.purchase_order_items.length}</TableCell>
               <TableCell className="text-center">
                 <Badge variant={order.status === 'pending' ? 'default' : 'secondary'}>
                   {order.status}

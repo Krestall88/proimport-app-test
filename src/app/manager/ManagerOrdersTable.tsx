@@ -35,7 +35,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
-      setSelectedRows(orders.map(item => item.order_item_id));
+      setSelectedRows(orders.map(item => item.purchase_order_id));
     } else {
       setSelectedRows([]);
     }
@@ -140,11 +140,11 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
               <tr><td colSpan={15} className="text-center p-4">Нет заказов для отображения.</td></tr>
             ) : (
               orders.map((item) => (
-                <tr key={item.order_item_id} className="border-b align-top" data-state={selectedRows.includes(item.order_item_id) ? 'selected' : ''}>
+                <tr key={item.purchase_order_id} className="border-b align-top" data-state={selectedRows.includes(item.purchase_order_id) ? 'selected' : ''}>
                   <td className="p-2 border">
                     <Checkbox 
-                      checked={selectedRows.includes(item.order_item_id)}
-                      onCheckedChange={() => handleSelectRow(item.order_item_id)}
+                      checked={selectedRows.includes(item.purchase_order_id)}
+                      onCheckedChange={() => handleSelectRow(item.purchase_order_id)}
                     />
                   </td>
                   <td className="p-2 border font-medium">{item.customer_name}</td>
@@ -174,7 +174,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteRow(item.order_item_id)}
+                      onClick={() => handleDeleteRow(item.purchase_order_id)}
                       className="text-red-600 hover:text-red-800"
                     >
                       <Trash2 className="w-4 h-4" />

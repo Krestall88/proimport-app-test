@@ -8,36 +8,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useTransition } from 'react';
 
 // ... (интерфейсы и statusMap остаются теми же)
-export interface WarehouseOrderItem {
-  order_id: string;
-  created_at: string;
-  shipped_at?: string | null;
-  status: string;
-  customer_name: string;
-  customer: {
-    name: string;
-    contacts: {
-      phone?: string | null;
-      email?: string | null;
-    } | null;
-    tin?: string;
-    kpp?: string;
-    delivery_address?: string;
-    payment_terms?: string;
-  } | null;
-  order_item_id: string;
-  product: {
-    nomenclature_code: string;
-    description?: string | null;
-    category?: string;
-    expiry_date?: string | null;
-    batch_number?: string | null;
-    unit?: string | null;
-  };
-  available_quantity: number;
-  price_per_unit?: number;
-  final_price?: number;
-}
+import type { WarehouseOrderItem } from '@/lib/types';
 
 interface WarehouseOrdersTableProps {
   orders: WarehouseOrderItem[];
@@ -86,8 +57,8 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
   };
 
   const grouped = orders.reduce((acc, item) => {
-    acc[item.order_id] = acc[item.order_id] || { ...item, items: [] };
-    acc[item.order_id].items.push(item);
+    acc[item.purchase_order_id] = acc[item.purchase_order_id] || { ...item, items: [] };
+    acc[item.purchase_order_id].items.push(item);
     return acc;
   }, {} as Record<string, WarehouseOrderItem & { items: WarehouseOrderItem[] }>);
   // Сортировка: новые статусы всегда сверху, внутри групп — по дате (новые сверху)
@@ -134,12 +105,12 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
             <tr><td colSpan={7} className="text-center p-6">Нет заказов для отображения.</td></tr>
           ) : (
             groupedOrders.map(order => (
-              <React.Fragment key={order.order_id}>
-                <tr className="border-b align-top hover:bg-muted/50 cursor-pointer" onClick={() => toggleRow(order.order_id)}>
+              <React.Fragment key={order.purchase_order_id}>
+                <tr className="border-b align-top hover:bg-muted/50 cursor-pointer" onClick={() => toggleRow(order.purchase_order_id)}>
                   <td className="p-3 border-r text-center">
-                    {expandedRows.has(order.order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    {expandedRows.has(order.purchase_order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </td>
-                  <td className="p-3 border-r font-mono">{order.order_id.substring(0, 8)}</td>
+                  <td className="p-3 border-r font-mono">{order.purchase_order_id.substring(0, 8)}</td>
                   <td className="p-3 border-r">
                     <div>
                       <div>{order.customer_name}</div>
@@ -163,10 +134,10 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                   <td className="p-3 text-center">
                     <div className="flex justify-center space-x-2" onClick={(e) => e.stopPropagation()}>
                       {(order.status === 'new' || order.status === 'picking') && (
-                        <ConfirmPickButton orderId={order.order_id} currentStatus={order.status} />
+                        <ConfirmPickButton orderId={order.purchase_order_id} currentStatus={order.status} />
                       )}
                       <button 
-                        onClick={() => openDeleteDialog(order.order_id)}
+                        onClick={() => openDeleteDialog(order.purchase_order_id)}
                         disabled={isPending}
                         className="p-2 text-red-500 hover:text-red-700 disabled:opacity-50"
                         title="Удалить заказ"
@@ -176,7 +147,7 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                     </div>
                   </td>
                 </tr>
-                {expandedRows.has(order.order_id) && (
+                {expandedRows.has(order.purchase_order_id) && (
                   <tr className="bg-muted/20">
                     <td colSpan={7} className="p-0 border-b">
                       <div className="p-4">
@@ -197,7 +168,12 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                           <tbody>
                             {order.items.map(item => (
                               <tr key={item.order_item_id} className="border-t">
-                                <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product.title ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product.description ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product.category ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product.nomenclature_code ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
+                                <td className="p-2 border-r">{item.product.batch_number ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.description ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.category ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>

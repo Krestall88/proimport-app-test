@@ -1,37 +1,9 @@
-
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import React from 'react';
 import AgentOrdersTable from '../components/AgentOrdersTable';
 
-// Тип для элементов заказа, как они приходят из представления manager_customer_orders_view
-interface DbOrderItem {
-  order_id: string;
-  created_at: string;
-  status: string;
-  customer_name: string;
-  customer_contacts?: {
-    phone?: string | null;
-    email?: string | null;
-  } | null;
-  customer_tin?: string;
-  customer_kpp?: string;
-  customer_delivery_address?: string;
-  customer_payment_terms?: string;
-  order_item_id: string;
-  product_title: string;
-  description: string;
-  sku: string;
-  category: string;
-  batch_number: string;
-  expiry_date: string;
-  quantity: number;
-  unit: string;
-  final_price: number;
-  item_total: number;
-}
-
-// Тип для заказов, как они приходят из представления manager_customer_orders_view
+// Тип для сырых данных из БД
 interface DbOrder {
   order_id: string;
   created_at: string;
@@ -41,6 +13,8 @@ interface DbOrder {
     phone?: string | null;
     email?: string | null;
   } | null;
+  phone?: string | null;
+  email?: string | null;
   customer_tin?: string;
   customer_kpp?: string;
   customer_delivery_address?: string;
@@ -50,39 +24,21 @@ interface DbOrder {
   description: string;
   sku: string;
   category: string;
-  batch_number: string;
-  expiry_date: string;
+  batch_number?: string;
+  expiry_date?: string;
   quantity: number;
   unit: string;
   final_price: number;
   item_total: number;
 }
 
-// Тип для "плоского" списка, который ожидает AgentOrdersTable
-export interface AgentOrderItem {
-  order_id: string;
-  created_at: string;
-  status: string;
-  customer_name: string;
-  customer_contacts?: {
-    phone?: string | null;
-    email?: string | null;
-  } | null;
-  customer_tin?: string;
-  customer_kpp?: string;
-  customer_delivery_address?: string;
-  customer_payment_terms?: string;
-  order_item_id: string;
-  product: import('@/lib/types').Product;
-  available_quantity: number;
-  price_per_unit?: number;
-}
+import type { AgentOrderItem } from '@/lib/types';
 
 // Функция-адаптер для преобразования данных
 const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] => {
   if (!dbOrders) return [];
   return dbOrders.map(item => ({
-    order_id: item.order_id,
+    purchase_order_id: item.order_id,
     created_at: item.created_at,
     status: item.status,
     customer_name: item.customer_name,
@@ -94,17 +50,17 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
     order_item_id: item.order_item_id,
     product: {
       // TODO: После доработки view заменить sku на product_id
-      id: item.sku || '', // surrogate, нужен product_id
+      id: item.sku, // временно используем sku как surrogate для id
       title: item.product_title,
-      nomenclature_code: item.sku || 'N/A',
-      description: item.description || '',
+      nomenclature_code: item.sku,
+      description: item.description || '', // всегда string
       purchase_price: null,
       selling_price: null,
-      category: item.category ?? '',
-      unit: item.unit ?? '',
-      expiry_date: item.expiry_date ?? '',
-      batch_number: item.batch_number ?? '',
-      created_at: item.created_at || '',
+      category: item.category,
+      unit: item.unit,
+      expiry_date: item.expiry_date || undefined,
+      batch_number: item.batch_number || undefined,
+      created_at: item.created_at,
       supplier_id: null,
       characteristics: null,
       available_quantity: item.quantity || 0,

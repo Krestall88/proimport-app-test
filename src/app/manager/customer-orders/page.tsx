@@ -8,12 +8,12 @@ import type { ManagerOrderItem } from '@/lib/types';
 import ExpandableOrdersTable from '@/components/ui/ExpandableOrdersTable';
 import Link from 'next/link';
 import { deleteOrders } from './actions';
-import type { Order } from '@/components/ui/ExpandableOrdersTable';
+
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export default function ManagerOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<ManagerOrderItem[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [dialogState, setDialogState] = useState({ isOpen: false, orderIds: [] as string[] });
 
@@ -31,7 +31,7 @@ export default function ManagerOrdersPage() {
 
     if (result.success) {
       toast.success(`Успешно удалено ${orderIds.length} заказ(ов).`);
-      setOrders(prev => prev.filter(o => !orderIds.includes(o.id)));
+      setOrders(prev => prev.filter(o => !orderIds.includes(o.purchase_order_id)));
       setSelectedOrders(prev => {
         const newSet = new Set(prev);
         orderIds.forEach(id => newSet.delete(id));

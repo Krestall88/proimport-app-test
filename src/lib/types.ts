@@ -139,6 +139,29 @@ export interface InventoryItem {
 // (определения интерфейсов для детальной страницы приёмки должны быть здесь, если нужны)
 
 //==============================================================================
+// Agent Module Types
+//==============================================================================
+
+export interface AgentOrderItem {
+  purchase_order_id: string;
+  created_at: string;
+  status: string;
+  customer_name: string;
+  customer_contacts?: {
+    phone?: string | null;
+    email?: string | null;
+  } | null;
+  customer_tin?: string;
+  customer_kpp?: string;
+  customer_delivery_address?: string;
+  customer_payment_terms?: string;
+  order_item_id: string;
+  product: Product;
+  available_quantity: number;
+  price_per_unit?: number;
+}
+
+//==============================================================================
 // Manager Module Types
 //==============================================================================
 

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { OrderWithSupplierName } from '@/lib/types';
+
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('ru-RU');

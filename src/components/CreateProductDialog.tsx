@@ -17,6 +17,7 @@ import { createProductAction } from '@/app/products/create/actions'
 import { toast } from 'sonner'
 import { PlusCircle } from 'lucide-react'
 
+import { Product } from '@/lib/types';
 // Определяем тип для нового товара, чтобы передавать его обратно
 export type NewProduct = {
   id: string;

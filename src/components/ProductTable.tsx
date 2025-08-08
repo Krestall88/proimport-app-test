@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import type { Database } from '@/lib/database.types';
+import { Product } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { deleteProduct, deleteProducts } from '@/app/manager/actions';
 
-type Product = Database['public']['Tables']['products']['Row'];
+
 
 interface ProductTableProps {
   products: Product[];

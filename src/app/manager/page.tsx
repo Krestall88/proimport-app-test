@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { Database } from '@/lib/database.types';
 import { toast } from 'sonner';
 
-type Product = Database['public']['Tables']['products']['Row'];
+import { Product } from '@/lib/types';
 
 export default function ManagerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -19,7 +19,10 @@ export default function ManagerProductsPage() {
       if (error) {
         toast.error('Ошибка при загрузке товаров');
       } else {
-        setProducts(data || []);
+        setProducts((data ?? []).map((p: any) => ({
+          ...p,
+          description: p.description ?? '',
+        })) as Product[]);
       }
     };
     fetchProducts();

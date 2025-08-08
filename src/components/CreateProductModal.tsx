@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import type { Database } from '@/lib/database.types';
+import { Product } from '@/lib/types';
 
-type Product = Database['public']['Tables']['products']['Row'];
+
 
 interface CreateProductModalProps {
   onProductCreated?: (newProduct: Product, quantity: number) => void;

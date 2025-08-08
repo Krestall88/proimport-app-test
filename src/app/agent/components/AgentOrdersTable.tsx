@@ -8,40 +8,7 @@ import { deleteOrderItems, deleteEntireOrder } from '../customer-orders/actions'
 import { toast } from 'sonner';
 import { type CheckedState } from "@radix-ui/react-checkbox";
 
-interface Product {
-  title: string;
-  description: string;
-  batch_number: string;
-  expiry_date: string;
-  nomenclature_code: string;
-  unit?: string | null;
-}
-
-interface AgentOrderItem {
-  order_id: string;
-  created_at: string;
-  status: string;
-  customer_name: string;
-  customer_contacts?: {
-    phone?: string | null;
-    email?: string | null;
-  } | null;
-  customer_tin?: string;
-  customer_kpp?: string;
-  customer_delivery_address?: string;
-  customer_payment_terms?: string;
-  order_item_id: string;
-  product: {
-    title: string;
-    description: string;
-    batch_number: string;
-    expiry_date: string;
-    nomenclature_code: string;
-    unit: string;
-  };
-  available_quantity: number;
-  price_per_unit?: number;
-}
+import type { AgentOrderItem } from '@/lib/types';
 
 interface AgentOrdersTableProps {
   orders: AgentOrderItem[];
@@ -82,7 +49,7 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
 
   const groupedOrders: GroupedOrder[] = useMemo(() => {
     const grouped = orders.reduce((acc, item: AgentOrderItem) => {
-      const key = item.order_id;
+      const key = item.purchase_order_id;
       if (!acc[key]) {
         acc[key] = { ...item, items: [], total_sum: 0 };
       }
@@ -164,7 +131,7 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
       />
       <div className="mb-4 flex items-center gap-4">
         <Button
-          onClick={() => handleDeleteEntireOrder(groupedOrders[0].order_id)}
+          onClick={() => handleDeleteEntireOrder(groupedOrders[0].purchase_order_id)}
           disabled={selectedRows.length === 0 || isPending}
           variant="destructive"
         >
@@ -192,12 +159,12 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
               <tr><td colSpan={7} className="text-center p-6">Нет заказов для отображения.</td></tr>
             ) : (
               groupedOrders.map((order: GroupedOrder) => (
-                <React.Fragment key={order.order_id}>
+                <React.Fragment key={order.purchase_order_id}>
                   <tr className="border-b align-top hover:bg-muted/50" data-state={selectedRows.some(id => order.items.some(item => item.order_item_id === id)) ? 'selected' : ''}>
-                    <td className="p-3 border-r text-center cursor-pointer" onClick={() => toggleRow(order.order_id)}>
-                      {expandedRows.has(order.order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    <td className="p-3 border-r text-center cursor-pointer" onClick={() => toggleRow(order.purchase_order_id)}>
+                      {expandedRows.has(order.purchase_order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                     </td>
-                    <td className="p-3 border-r font-mono whitespace-nowrap">{order.order_id.substring(0, 8)}</td>
+                    <td className="p-3 border-r font-mono whitespace-nowrap">{order.purchase_order_id.substring(0, 8)}</td>
                     <td className="p-3 border-r whitespace-nowrap">{order.customer_name}</td>
                     <td className="p-3 border-r whitespace-nowrap">{new Date(order.created_at).toLocaleString("ru-RU")}</td>
                     <td className="p-3 border-r whitespace-nowrap">
@@ -208,7 +175,7 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
                     <td className="p-3 border-r text-center">{order.items.length}</td>
                     <td className="p-3 text-right font-bold whitespace-nowrap">{formatCurrency(order.total_sum)}</td>
                   </tr>
-                  {expandedRows.has(order.order_id) && (
+                  {expandedRows.has(order.purchase_order_id) && (
                     <tr className="bg-muted/20">
                       <td colSpan={7} className="p-0 border-b">
                         <div className="p-4">

@@ -94,6 +94,7 @@ export type PurchaseOrderItem = {
 
 export type PurchaseOrder = {
   id: string;
+  created_at: string;
   expected_delivery_date: string | null;
   status: string;
   supplier_id: string;

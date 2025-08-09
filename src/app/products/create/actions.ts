@@ -16,20 +16,18 @@ export async function createProduct(formData: FormData) {
     return redirect('/?message=Нет прав на создание товара.&type=error');
   }
 
+  const name = formData.get('name') as string;
+  const sku = (formData.get('sku') as string) || '';
   const payload = {
-    name: formData.get('name') as string,
-    description: (formData.get('description') as string) || null,
-    sku: (formData.get('sku') as string) || null,
-    category: (formData.get('category') as string) || null,
-    unit: (formData.get('unit') as string) || null,
+    title: name,
+    nomenclature_code: sku || name || crypto.randomUUID(),
+    description: (formData.get('description') as string) || '',
+    category: (formData.get('category') as string) || '',
+    unit: (formData.get('unit') as string) || '',
     purchase_price: formData.get('purchase_price') ? Number(formData.get('purchase_price')) : null,
-    expiration_date: (formData.get('expiration_date') as string) || null,
-    storage_place: (formData.get('storage_place') as string) || null,
-    barcode: (formData.get('barcode') as string) || null,
-    comment: (formData.get('comment') as string) || null,
   };
 
-  if (!payload.name) {
+  if (!payload.title) {
     return redirect('/products/create?message=Название обязательно.&type=error');
   }
 

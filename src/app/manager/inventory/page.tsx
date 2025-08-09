@@ -8,7 +8,7 @@ export default async function InventoryPage() {
   return (
     <div className="space-y-6">
       
-      <InventoryTable inventory={inventory} />
+      <InventoryTable inventory={inventory} loading={false} />
     </div>
   );
 }

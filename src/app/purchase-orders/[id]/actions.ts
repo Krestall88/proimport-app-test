@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { PurchaseOrderStatus } from '@/lib/types';
 
 export async function updatePurchaseOrderStatus(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -56,11 +56,11 @@ export async function updatePurchaseOrderStatus(formData: FormData) {
       goods_receipt_id: 'goods_receipt_id', // Replace with actual goods receipt ID
       purchase_order_item_id: item.id,
       product_id: item.product_id,
-      quantity_received: item.quantity, // Assuming full receipt for now
+      quantity_received: Number(item.quantity), // Всегда число, без null
       batch_number: `BATCH-${Date.now()}`,
       expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
       status: 'received',
-      price_per_unit: item.product.purchase_price
+      price_per_unit: item.product.purchase_price ?? null
     }));
 
     // Insert items into goods_receipt_items
@@ -73,9 +73,9 @@ export async function updatePurchaseOrderStatus(formData: FormData) {
       return redirect(`/purchase-orders/${orderId}?message=Не удалось создать записи о приемке товара.&type=error`);
     }
 
-    const { error: rpcError } = await supabase.rpc('add_to_inventory', {
-      p_product_name: order.items[0].product.name,
-      p_quantity: actualQuantity,
+    const { error: rpcError } = await supabase.rpc('upsert_inventory_on_receipt', {
+      p_product_id: order.items[0].product_id,
+      p_quantity_to_add: actualQuantity,
     });
 
     if (rpcError) {

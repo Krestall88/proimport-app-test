@@ -60,6 +60,8 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
  */
 
 
+// Корректная типизация: возвращает WarehouseOrderItem[] из актуальной вьюхи warehouse_orders_view
+// TODO: Проверить соответствие структуры WarehouseOrderItem и warehouse_orders_view глобальному типу (fields: nomenclature_code, description: string, batch_number, expiry_date и др.)
 export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
   const supabase = await createClient();
 
@@ -73,7 +75,6 @@ export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
     return [];
   }
 
-  // View уже возвращает все нужные поля (без цен)
   return (data ?? []) as WarehouseOrderItem[];
 }
 

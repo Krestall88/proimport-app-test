@@ -3,8 +3,19 @@ import { useEffect, useState } from 'react';
 import { getSuppliers } from '@/lib/actions/suppliers';
 import SupplierCard from './SupplierCard';
 
+// Импортируйте SupplierInfo, если он определён в другом месте, либо определите локально:
+interface SupplierInfo {
+  id: string;
+  name: string;
+  tin?: string;
+  kpp?: string;
+  contacts?: { phone?: string; email?: string };
+  delivery_address?: string;
+  payment_terms?: string;
+}
+
 export default function SupplierList() {
-  const [suppliers, setSuppliers] = useState([]);
+  const [suppliers, setSuppliers] = useState<SupplierInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -20,10 +20,15 @@ const ManagerSupplierDetailPage = async function (props: any) {
     delivery_address: supplier.delivery_address ?? '',
     payment_terms: supplier.payment_terms ?? '',
     comments: supplier.comments ?? '',
-    contacts: {
-      phone: supplier.contacts?.phone ?? '',
-      email: supplier.contacts?.email ?? '',
-    },
+    contacts: (() => {
+      if (supplier.contacts && typeof supplier.contacts === 'object' && !Array.isArray(supplier.contacts)) {
+        return {
+          phone: (supplier.contacts as any).phone ?? '',
+          email: (supplier.contacts as any).email ?? '',
+        };
+      }
+      return { phone: '', email: '' };
+    })(),
   };
 
   return <SupplierDetail supplier={normalizedSupplier} canEdit={canEdit} />;

@@ -7,15 +7,9 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useRouter } from 'next/navigation';
 import { deleteSupplier } from '@/lib/actions/suppliers';
 
-interface Supplier {
-  id: string;
-  name: string;
-  tin?: string;
-  kpp?: string;
-  delivery_address?: string;
-  contacts?: { phone?: string; email?: string };
-  payment_terms?: string;
-}
+import type { Supplier } from '@/lib/types';
+
+
 
 export default function SupplierTableClient({ suppliers, canDelete }: { suppliers: Supplier[]; canDelete: boolean; }) {
   const router = useRouter();

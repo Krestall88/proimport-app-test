@@ -1,7 +1,8 @@
 import React from 'react';
+import type { Supplier } from '@/lib/types';
 
 interface SupplierCardProps {
-  supplier: any;
+  supplier: Supplier;
 }
 
 export default function SupplierCard({ supplier }: SupplierCardProps) {
@@ -15,7 +16,7 @@ export default function SupplierCard({ supplier }: SupplierCardProps) {
       <div className="text-sm text-gray-400">Условия оплаты: {supplier.payment_terms || '-'}</div>
       <div className="text-sm text-gray-400">Телефон: {contacts.phone || '-'}</div>
       <div className="text-sm text-gray-400">Email: {contacts.email || '-'}</div>
-      <div className="text-sm text-gray-400">Комментарий: {supplier.comments || supplier.comment || '-'}</div>
+      <div className="text-sm text-gray-400">Комментарий: {supplier.comments || '-'}</div>
     </div>
   );
 }

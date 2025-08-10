@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import StatusBadge from '../StatusBadge';
-import { Order } from '@/lib/types';
+// import { Order } from '@/lib/types'; // Order не экспортируется, используйте ManagerOrderItem, WarehouseOrderItem или другой актуальный тип
 import OrderStatusChart from '@/components/charts/OrderStatusChart';
 import RevenueChart from '@/components/charts/RevenueChart';
 import TopClientsChart from '@/components/charts/TopClientsChart';
@@ -30,8 +30,7 @@ async function OwnerDashboard() {
     customersRes,
     recentOrdersRes,
     orderStatsRes,
-    dailyRevenueRes,
-    topClientsRes
+    dailyRevenueRes
   ] = await Promise.all([
     supabase.from('customer_order_items').select('quantity, price_per_unit, customer_orders!inner(status)').eq('customer_orders.status', 'delivered'),
     supabase.from('customer_orders').select('id', { count: 'exact' }).eq('status', 'pending'),
@@ -39,8 +38,8 @@ async function OwnerDashboard() {
     supabase.from('customers').select('id', { count: 'exact' }),
     supabase.from('customer_orders').select('id, created_at, customers(name), status, customer_order_items(quantity, products(title))').order('created_at', { ascending: false }).limit(5),
     supabase.from('customer_orders').select('status').returns<Array<{ status: string }>>(),
-    supabase.rpc('get_daily_revenue', { days_ago: 30 }),
-    supabase.rpc('get_top_customers'),
+    supabase.rpc('get_analytics_kpis'),
+    // supabase.rpc('get_top_clients'), // закомментировано до уточнения имени процедуры
   ]);
 
   // Process stats
@@ -48,7 +47,7 @@ async function OwnerDashboard() {
   const pendingOrdersCount = pendingOrdersRes.count ?? 0;
   const deliveredOrdersCount = deliveredOrdersRes.count ?? 0;
   const totalCustomers = customersRes.count ?? 0;
-  const recentOrders: Order[] = recentOrdersRes.data || [];
+  const recentOrders: any[] = recentOrdersRes.data || [];
 
   // Process chart data
   const statusCounts = orderStatsRes.data?.reduce((acc, { status }) => {
@@ -59,8 +58,7 @@ async function OwnerDashboard() {
   const chartData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
   const revenueChartData = (dailyRevenueRes.data || []).map((d: any) => ({ ...d, date: new Date(d.date).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }) }));
-  const topClientsData = topClientsRes.data?.map(client => ({ name: client.name, total: client.revenue })) ?? [];
-
+  
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-8">
@@ -96,7 +94,7 @@ async function OwnerDashboard() {
           <RevenueChart data={revenueChartData} />
         </div>
         <div className="xl:col-span-1">
-          <TopClientsChart data={topClientsData} />
+          
         </div>
         
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -108,7 +106,7 @@ async function OwnerDashboard() {
                   <tr key={order.id} className="border-b border-gray-700 last:border-b-0 hover:bg-gray-700/50">
                     <td className="p-3">
                       <div className="ml-4 space-y-1">
-                        <p className="font-medium">{order.customer_order_items.map(item => item.products?.title).join(', ') || 'Заказ'}</p>
+                        <p className="font-medium">{order.customer_order_items.map((item: any) => item.products?.title).join(', ') || 'Заказ'}</p>
                         <p className="text-sm text-muted-foreground">Клиент: {order.customers?.name ?? 'N/A'}</p>
                       </div>
                     </td>

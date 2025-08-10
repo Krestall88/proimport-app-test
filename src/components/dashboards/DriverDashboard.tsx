@@ -5,7 +5,7 @@ import { OrderWithCustomerDetails } from '@/lib/types';
 const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU');
 
 async function ShippedOrdersList() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: orders, error } = await supabase
     .from('customer_orders')
@@ -13,7 +13,7 @@ async function ShippedOrdersList() {
       id,
       created_at,
       status,
-      customer:customers (name, address),
+      customer:customers (name),
       customer_order_items(quantity, product:products(title))
     `)
     .eq('status', 'shipped');
@@ -36,7 +36,7 @@ async function ShippedOrdersList() {
                 <th className="p-4 font-semibold">Дата</th>
                 <th className="p-4 font-semibold">Товар</th>
                 <th className="p-4 font-semibold">Клиент</th>
-                <th className="p-4 font-semibold">Адрес</th>
+                
                 <th className="p-4 font-semibold">Действие</th>
               </tr>
             </thead>
@@ -47,8 +47,8 @@ async function ShippedOrdersList() {
                   <td className="p-4 font-medium">
                     {order.customer_order_items.map(item => `${item.product.title} (${item.quantity} шт.)`).join(', ')}
                   </td>
-                  <td className="p-4">{order.customer?.[0]?.name ?? 'N/A'}</td>
-                  <td className="p-4">{order.customer?.[0]?.address ?? 'N/A'}</td>
+                  <td className="p-4">{order.customer?.name ?? 'N/A'}</td>
+                  
                   <td className="p-4">
                     <Link href={`/customer-orders/${order.id}`} className="text-blue-400 hover:underline">
                       Посмотреть

@@ -1,3 +1,5 @@
+import React from 'react';
+import { Supplier } from '@/lib/types';
 import { createClient } from '@/lib/supabase/server';
 import SupplierDetail from './SupplierDetail';
 import { notFound } from 'next/navigation';

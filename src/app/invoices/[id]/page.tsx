@@ -15,9 +15,7 @@ interface Customer {
   } | null;
 }
 
-interface Product {
-  title: string;
-}
+import { Product } from '@/lib/types';
 
 interface OrderItem {
   quantity: number;

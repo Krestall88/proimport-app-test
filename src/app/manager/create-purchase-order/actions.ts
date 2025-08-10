@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 
 import type { Product } from '@/lib/types';
 
-type CartItem = { product: Product; qty: number }; // глобальный формат корзины
+import type { CartItem } from '@/lib/types'; // глобальный формат корзины
 
 export async function createProductFromWishlist(product: {
   nomenclature_code: string;

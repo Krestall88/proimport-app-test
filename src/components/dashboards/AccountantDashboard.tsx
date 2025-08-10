@@ -34,7 +34,24 @@ async function DeliveredOrdersList() {
     return <p className="text-red-400">Не удалось загрузить финансовые данные.</p>;
   }
 
-  const orderItems = items as FinancialOrderItem[];
+  const orderItems: FinancialOrderItem[] = (items ?? []).map((item: any) => ({
+  id: item.id,
+  quantity: item.quantity,
+  price_per_unit: item.price_per_unit,
+  product: item.products ? {
+    id: item.products.id ?? '-',
+    title: item.products.title ?? '-',
+    nomenclature_code: item.products.nomenclature_code ?? '-',
+    description: item.products.description ?? '',
+    purchase_price: item.products.purchase_price ?? null,
+    selling_price: item.products.selling_price ?? null,
+    category: item.products.category ?? '',
+    unit: item.products.unit ?? '',
+    created_at: item.products.created_at ?? '',
+    supplier_id: item.products.supplier_id ?? null,
+  } : null,
+  customer_orders: item.customer_orders,
+}));
 
   return (
     <div>
@@ -57,7 +74,7 @@ async function DeliveredOrdersList() {
               {orderItems.map(item => (
                 <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/50">
                   <td className="p-4 whitespace-nowrap">{item.customer_orders ? formatDate(item.customer_orders.created_at) : '-'}</td>
-                  <td className="p-4 font-medium">{item.products?.title ?? 'Товар не найден'} ({item.quantity} шт.)</td>
+                  <td className="p-4 font-medium">{item.product?.title ?? 'Товар не найден'} ({item.quantity} шт.)</td>
                   <td className="p-4">{item.customer_orders?.customers?.name ?? 'Клиент не найден'}</td>
                   <td className="p-4 text-right font-mono">{formatCurrency(item.quantity * item.price_per_unit)}</td>
                   <td className="p-4">

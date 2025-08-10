@@ -6,16 +6,7 @@ import { updateSupplier, deleteSupplier } from '@/lib/actions/suppliers';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
-interface Supplier {
-  id: string;
-  name: string;
-  tin?: string;
-  kpp?: string;
-  delivery_address?: string;
-  payment_terms?: string;
-  contacts?: { phone?: string; email?: string };
-  comments?: string;
-}
+import type { Supplier } from '@/lib/types';
 
 interface SupplierDetailProps {
   supplier: Supplier;

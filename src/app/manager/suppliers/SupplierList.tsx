@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Supplier } from '@/lib/types';
 import { getSuppliers } from '@/lib/actions/suppliers';
 import SupplierCard from './SupplierCard';
 
@@ -15,7 +16,7 @@ interface SupplierInfo {
 }
 
 export default function SupplierList() {
-  const [suppliers, setSuppliers] = useState<SupplierInfo[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

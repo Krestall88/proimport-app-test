@@ -7,11 +7,11 @@ const formatDate = (dateString: string) => {
 };
 
 export default async function WarehouseManagerDashboard() {
-  const supabase = createClient();
+  const supabase = await createClient();
   // fetch counts for quick nav badges
   const [{ count: receivingCount }, { count: inventoryCount }] = await Promise.all([
     supabase.from('purchase_orders').select('id', { count: 'exact', head: true }).in('status', ['ordered', 'in_transit']),
-    supabase.from('inventory_items').select('id', { count: 'exact', head: true }),
+    supabase.from('inventory').select('id', { count: 'exact', head: true }),
   ] as const);
 
   const { data: orders, error } = await supabase

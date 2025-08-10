@@ -77,10 +77,14 @@ export default function PendingShipments({ purchaseOrders }: PendingShipmentsPro
                 <div className="flex justify-between items-center w-full pr-4">
                   <div className="text-left">
                     <span className="font-medium">Заказ №{order.id.substring(0, 8)}</span>
-                    <span className="text-sm text-muted-foreground ml-4">Поставщик: {order.supplier.name}</span>
+                    <span className="text-sm text-muted-foreground ml-4">
+                      Поставщик: {order.supplier?.name ?? 'Неизвестно'}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-muted-foreground mr-4">Ожидается: {new Date(order.expected_delivery_date).toLocaleDateString()}</span>
+                    <span className="text-sm text-muted-foreground mr-4">
+  Ожидается: {order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : '—'}
+</span>
                     <Badge variant="outline">{order.status}</Badge>
                     <Button 
                       variant="ghost" 
@@ -114,12 +118,12 @@ export default function PendingShipments({ purchaseOrders }: PendingShipmentsPro
                     <TableBody>
                       {order.purchase_order_items.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell>{item.product.nomenclature_code}</TableCell>
-                          <TableCell>{item.product.title}</TableCell>
+                          <TableCell>{item.product?.nomenclature_code ?? '—'}</TableCell>
+                          <TableCell>{item.product?.title ?? '—'}</TableCell>
                           <TableCell>{item.product?.description ?? 'Нет описания'}</TableCell>
                           <TableCell>{item.product?.category ?? 'N/A'}</TableCell>
                           <TableCell className="text-right">{item.quantity_ordered}</TableCell>
-                          <TableCell>{item.product.unit}</TableCell>
+                          <TableCell>{item.product?.unit ?? '—'}</TableCell>
                           <TableCell>
                             <Button 
                               variant="ghost" 

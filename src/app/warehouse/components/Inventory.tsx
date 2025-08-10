@@ -18,7 +18,23 @@ export default function Inventory({ inventory }: InventoryProps) {
         <CardDescription>Текущие остатки товаров на складе.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ProductTable role={role} />
+        {role === 'owner' || role === 'warehouse_manager' || role === 'agent' ? (
+          <ProductTable
+            role={role}
+            products={Array.isArray(inventory) ? inventory.map((item) => ({
+              // Маппинг минимальный, если inventory уже Product[] — просто item
+              ...(item || {}),
+              description: typeof item?.description === 'string' ? item.description : '',
+              // TODO: добавить остальные обязательные поля Product, если нужно
+            })) : []}
+            onProductsChange={() => {}}
+          />
+        ) : (
+          <div style={{ color: 'red' }}>
+            Некорректная роль пользователя: {role}. Таблица товаров недоступна.
+            {/* TODO: поддержка новых ролей, если потребуется */}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

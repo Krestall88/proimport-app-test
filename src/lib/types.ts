@@ -39,12 +39,15 @@ export interface Customer {
 export interface Supplier {
   id: string;
   name: string;
-  contact_person?: string; // опционально, если в БД нет такого поля
+  tin?: string | null;
+  kpp?: string | null;
+  delivery_address?: string | null;
+  payment_terms?: string | null;
   contacts: {
     phone?: string | null;
     email?: string | null;
-  } | null;
-  tin?: string | null;
+  };
+  comments?: string | null;
 }
 
 
@@ -225,6 +228,9 @@ export interface ManagerGoodsReceipt {
   notes?: string; 
   description: string; // теперь всегда строка, даже если поле пустое
 }
+
+// Корзина заказов (унифицированный тип для всех модулей)
+export type CartItem = { product: Product; qty: number };
 
 // 
 export interface CustomerInfo {

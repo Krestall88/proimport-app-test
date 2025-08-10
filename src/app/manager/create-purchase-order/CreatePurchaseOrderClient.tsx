@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product, Supplier } from '@/lib/types';
+import { Product, CartItem, Supplier } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 
-type CartItem = { product: Product; qty: number; editing?: boolean };
+
 
 interface Props {
   products: Product[];
@@ -70,23 +70,13 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
         return prev;
       }
       toast.success(`${p.title} добавлен в корзину.`);
-      return [...prev, { product: p, qty: 1, editing: false }];
+      return [...prev, { product: p, qty: 1 }];
     });
   };
 
-  const startEditing = (product: Product) => {
-    setEditingProduct(product);
-    setCart((prev) =>
-      prev.map((item) =>
-        item.product.id === product.id ? { ...item, editing: true } : item
-      )
-    );
-  };
+  
 
-  const handleCancelEdit = () => {
-    setEditingProduct(null);
-    setCart((prev) => prev.map((item) => ({ ...item, editing: false })));
-  };
+  
 
   const updateProductField = async (productId: string, field: keyof Product, value: any) => {
     const supabase = createClient();
@@ -103,7 +93,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     // Обновляем все места, где используется этот товар
     setCart((prev) =>
       prev.map((item) =>
-        item.product.id === productId ? { ...item, product: { ...item.product, [field]: value } } : item
+        editingProduct?.id === item.product.id ? { ...item, product: { ...item.product, [field]: value } } : item
       )
     );
     setAllProducts((prev) =>
@@ -111,7 +101,7 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
     );
 
     toast.success('Товар успешно обновлен!');
-    handleCancelEdit();
+    setEditingProduct(null);
   };
 
   const updateQty = (id: string, qty: number) => {
@@ -237,76 +227,64 @@ export default function CreatePurchaseOrderClient({ products }: Props) {
                         <Button
                           variant="outline"
                           size="icon"
-                          onClick={() => startEditing(ci.product)}
-                          disabled={ci.editing}
+                          onClick={() => setEditingProduct(ci.product)}
+                          disabled={editingProduct?.id === ci.product.id}
                         >
                           ✎
                         </Button>
-                        <Input
-                          type="number"
-                          min={1}
-                          value={ci.qty}
-                          onChange={(e) => updateQty(ci.product.id, Number(e.target.value))}
-                          className="w-20 h-9"
-                        />
-                        <Button variant="destructive" size="icon" onClick={() => remove(ci.product.id)}>
-                          ✕
-                        </Button>
+                        {editingProduct?.id === ci.product.id && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            <div>
+                              <Label htmlFor={`title-${ci.product.id}`}>Наименование</Label>
+                              <Input
+                                id={`title-${ci.product.id}`}
+                                value={ci.product.title}
+                                onChange={(e) => updateProductField(ci.product.id, 'title', e.target.value)}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`nomenclature_code-${ci.product.id}`}>Артикул</Label>
+                              <Input
+                                id={`nomenclature_code-${ci.product.id}`}
+                                value={ci.product.nomenclature_code}
+                                onChange={(e) => updateProductField(ci.product.id, 'nomenclature_code', e.target.value)}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`batch_number-${ci.product.id}`}>Партия</Label>
+                              <Input
+                                id={`batch_number-${ci.product.id}`}
+                                value={ci.product.batch_number ?? ''}
+                                onChange={(e) => updateProductField(ci.product.id, 'batch_number', e.target.value)}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`expiry_date-${ci.product.id}`}>Срок годности</Label>
+                              <Input
+                                id={`expiry_date-${ci.product.id}`}
+                                type="date"
+                                value={ci.product.expiry_date}
+                                onChange={(e) => updateProductField(ci.product.id, 'expiry_date', e.target.value)}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`purchase_price-${ci.product.id}`}>Закупочная цена</Label>
+                              <Input
+                                id={`purchase_price-${ci.product.id}`}
+                                type="number"
+                                value={ci.product.purchase_price?.toString() || ''}
+                                onChange={(e) => updateProductField(ci.product.id, 'purchase_price', parseFloat(e.target.value))}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    {ci.editing && (
-                      <div className="mt-2">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor={`title-${ci.product.id}`}>Название</Label>
-                            <Input
-                              id={`title-${ci.product.id}`}
-                              value={ci.product.title}
-                              onChange={(e) => updateProductField(ci.product.id, 'title', e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`nomenclature_code-${ci.product.id}`}>Артикул</Label>
-                            <Input
-                              id={`nomenclature_code-${ci.product.id}`}
-                              value={ci.product.nomenclature_code}
-                              onChange={(e) => updateProductField(ci.product.id, 'nomenclature_code', e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`batch_number-${ci.product.id}`}>Партия</Label>
-                            <Input
-                              id={`batch_number-${ci.product.id}`}
-                              value={ci.product.batch_number ?? ''}
-                              onChange={(e) => updateProductField(ci.product.id, 'batch_number', e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`expiry_date-${ci.product.id}`}>Срок годности</Label>
-                            <Input
-                              id={`expiry_date-${ci.product.id}`}
-                              type="date"
-                              value={ci.product.expiry_date}
-                              onChange={(e) => updateProductField(ci.product.id, 'expiry_date', e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`purchase_price-${ci.product.id}`}>Закупочная цена</Label>
-                            <Input
-                              id={`purchase_price-${ci.product.id}`}
-                              type="number"
-                              value={ci.product.purchase_price?.toString() || ''}
-                              onChange={(e) => updateProductField(ci.product.id, 'purchase_price', parseFloat(e.target.value))}
-                              className="w-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}

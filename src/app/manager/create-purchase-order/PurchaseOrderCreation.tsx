@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import type { Product, Supplier, PurchaseOrderItem } from '@/lib/types';
 
 
-type CartItem = { product: Product; qty: number };
+import type { CartItem } from '@/lib/types';
 
 export default function PurchaseOrderCreation() {
   const [cart, setCart] = useState<CartItem[]>(() => {

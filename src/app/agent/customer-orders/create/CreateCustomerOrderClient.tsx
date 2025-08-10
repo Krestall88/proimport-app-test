@@ -28,9 +28,7 @@ interface Customer {
   payment_terms?: string;
 }
 
-interface CartItem extends InventoryProduct {
-  quantity: number;
-}
+type CartItem = { product: InventoryProduct; qty: number };
 
 // Используем общий тип WishlistItem из @/lib/types/inventory
 
@@ -87,7 +85,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
 
   const displayInventory = useMemo(() => {
     const cartQtys: { [key: string]: number } = cart.reduce((acc, item) => {
-      acc[item.product_id] = (acc[item.product_id] || 0) + item.available_quantity;
+      acc[item.product.product_id] = (acc[item.product.product_id] || 0) + item.qty;
       return acc;
     }, {} as { [key: string]: number });
 
@@ -113,32 +111,30 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       toast.error("Количество должно быть больше нуля");
       return;
     }
-
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.product_id === product.product_id);
+      const existingItem = prevCart.find(item => item.product.product_id === product.product_id);
       if (existingItem) {
         return prevCart.map(item =>
-          item.product_id === product.product_id
-            ? { ...item, quantity: item.available_quantity + quantity }
+          item.product.product_id === product.product_id
+            ? { ...item, qty: item.qty + quantity }
             : item
         );
       } else {
-        // Убедимся, что final_price не будет undefined
-        const price = product.final_price ?? 0;
-        return [...prevCart, { ...product, quantity, final_price: price }];
+        const productForCart = { ...product };
+        return [...prevCart, { product: productForCart, qty: quantity }];
       }
     });
   };
 
   const handleRemoveFromCart = (productId: string) => {
-    setCart(cart.filter(item => item.product_id !== productId));
+    setCart(cart.filter(item => item.product.product_id !== productId));
   };
 
   const handleUpdateCartQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       handleRemoveFromCart(productId);
     } else {
-      setCart(cart.map(item => item.product_id === productId ? { ...item, quantity: newQuantity } : item));
+      setCart(cart.map(item => item.product.product_id === productId ? { ...item, qty: newQuantity } : item));
     }
   };
 
@@ -160,9 +156,9 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         
         // Проверяем, что все элементы корзины имеют корректную цену
         const validatedCart = cart.map(item => ({
-          product_id: item.product_id,
-          qty: item.available_quantity,
-          final_price: (item.final_price !== undefined && !isNaN(item.final_price)) ? item.final_price : 0,
+          product_id: item.product.product_id,
+          qty: item.qty,
+          final_price: (item.product.final_price !== undefined && !isNaN(item.product.final_price)) ? item.product.final_price : 0,
         }));
         
         console.log('DEBUG: Validated cart:', validatedCart);
@@ -194,38 +190,6 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       currency: 'KGS',
       minimumFractionDigits: 2,
     }).format(amount);
-  };
-
-  const totalAmount = useMemo(() => {
-    return cart.reduce((sum, item) => sum + (item.final_price * item.available_quantity), 0);
-  }, [cart]);
-
-  const handleWishlistChange = (newWishlist: WishlistItem[]) => {
-    setWishlist(newWishlist);
-  };
-
-  const handleAddWishlistToCart = (item: WishlistItem) => {
-    // Найти соответствующий товар в инвентаре
-    const product = displayInventory.find(p => p.title === (item.title || item.title));
-    if (product) {
-      const quantity = item.qty || 1;
-      if (quantity <= product.available_quantity) {
-        const cartItem: CartItem = { 
-          ...product, 
-          quantity,
-          final_price: product.final_price || 0
-        };
-        handleAddToCart(cartItem);
-      } else {
-        toast.error(`Недостаточно товара ${item.title || item.title} в наличии`);
-      }
-    } else {
-      toast.error(`Товар ${item.title || item.title} не найден в остатках`);
-    }
-  };
-
-  const handleRemoveFromWishlist = (title: string) => {
-    setWishlist(prev => prev.filter(item => (item.title || item.title) !== title));
   };
 
   return (
@@ -338,13 +302,13 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               </TableHeader>
               <TableBody>
                 {cart.map((item) => (
-                  <TableRow key={item.product_id}>
-                    <TableCell className="font-medium">{item.title || item.title}</TableCell>
-                    <TableCell className="text-right">{item.available_quantity} {item.unit}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(item.final_price)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(item.final_price * item.available_quantity)}</TableCell>
+                  <TableRow key={item.product.product_id}>
+                    <TableCell className="font-medium">{item.product.title || item.product.title}</TableCell>
+                    <TableCell className="text-right">{item.qty} {item.product.unit}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.product.final_price)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.product.final_price * item.qty)}</TableCell>
                     <TableCell className="text-center">
-                      <Button variant="destructive" size="sm" onClick={() => handleRemoveFromCart(item.product_id)}>Удалить</Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleRemoveFromCart(item.product.product_id)}>Удалить</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -357,7 +321,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
             <div className="pt-4 mt-4 border-t">
               <div className="flex justify-between font-bold">
                 <span>Итого</span>
-                <span>{formatCurrency(cart.reduce((acc, item) => acc + item.final_price * item.available_quantity, 0))}</span>
+                <span>{formatCurrency(cart.reduce((acc, item) => acc + item.product.final_price * item.qty, 0))}</span>
               </div>
             </div>
             <div className="flex justify-end mt-6">
@@ -375,7 +339,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         {/* Хотелки под корзиной */}
         <WishlistSection
           disabled={!selectedCustomerId}
-          onWishlistChange={handleWishlistChange}
+          onWishlistChange={setWishlist}
           inventory={inventory}
         />
       </div>

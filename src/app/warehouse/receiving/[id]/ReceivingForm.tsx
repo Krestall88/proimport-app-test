@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { PurchaseOrderDetails } from '@/lib/types';
+import { PurchaseOrder } from '@/lib/types';
 import { processReceipt } from '@/lib/actions/warehouse';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ReceivingFormProps {
-  order: PurchaseOrderDetails;
+  order: PurchaseOrder;
 }
 
 type FormItemState = {
@@ -43,12 +43,12 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
       quantity_received: item.quantity_ordered || '',
       batch_number: '',
       expiry_date: '',
-      description: item.product.description,
+      description: item.product?.description ?? '',
       notes: '',
-      nomenclature_code: item.product?.nomenclature_code ?? '-' ?? '',
-      title: item.product?.title ?? '-' ?? '',
-      category: item.product?.category ?? '-' ?? '',
-      unit: item.product?.unit ?? '-' ?? '',
+      nomenclature_code: item.product?.nomenclature_code ?? '-',
+      title: item.product?.title ?? '-',
+      category: item.product?.category ?? '-',
+      unit: item.product?.unit ?? '-',
     };
     return acc;
   }, {} as FormState);
@@ -143,7 +143,7 @@ export default function ReceivingForm({ order }: ReceivingFormProps) {
   function validateRow(itemId: string) {
     const item = formState[itemId];
     if (!item) return false;
-    const product = order.purchase_order_items.find(poItem => poItem.id === itemId)?.products;
+    const product = order.purchase_order_items.find(poItem => poItem.id === itemId)?.product;
     // expiry_date обязателен всегда
     if (!item.expiry_date) return false;
     // Если не было изменений, чекпоинт можно ставить только по expiry_date

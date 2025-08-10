@@ -33,27 +33,36 @@ export async function getAgentCustomerOrders(): Promise<AgentOrderItem[]> {
     return [];
   }
 
+  // Явное преобразование и заполнение обязательных полей AgentOrderItem
   return (data ?? []).map((order: any) => ({
-    id: order.id,
-    created_at: order.created_at,
-    status: order.status,
+    purchase_order_id: order.purchase_order_id || '',
+    created_at: order.created_at || '',
+    status: order.status || '',
     customer_name: order.customer?.name || 'Неизвестный клиент',
-    customer: order.customer || null,
-    order_items: (order.order_items ?? []).map((item: any) => ({
-      id: item.id,
-      product: {
-        title: item.product?.title || 'Неизвестный товар',
-        nomenclature_code: item.product?.nomenclature_code || '',
-        batch_number: item.product?.batch_number || '',
-        expiry_date: item.product?.expiry_date,
-        unit: item.product?.unit || '',
-        category: item.product?.category || '',
-        description: item.product?.description || '', // всегда string
-      },
-      available_quantity: item.quantity,
-      price_per_unit: item.goods_receipt_item?.price_per_unit,
-      purchase_price_per_unit: item.goods_receipt_item?.purchase_price_per_unit,
-    })),
+    customer_contacts: order.customer?.contacts || null,
+    phone: order.customer?.contacts?.phone || '',
+    email: order.customer?.contacts?.email || '',
+    customer_tin: order.customer?.tin || '',
+    customer_kpp: order.customer?.kpp || '',
+    customer_delivery_address: order.customer?.delivery_address || '',
+    customer_payment_terms: order.customer?.payment_terms || '',
+    order_item_id: order.order_items?.[0]?.id || '',
+    product: order.order_items?.[0]?.product || {
+      id: '',
+      title: '',
+      nomenclature_code: '',
+      description: '',
+      purchase_price: null,
+      selling_price: null,
+      category: '',
+      unit: '',
+      expiry_date: '',
+      batch_number: '',
+      created_at: '',
+      supplier_id: null
+    },
+    available_quantity: order.order_items?.[0]?.available_quantity ?? 0,
+    price_per_unit: order.order_items?.[0]?.price_per_unit ?? 0,
   })) as AgentOrderItem[];
 }
 

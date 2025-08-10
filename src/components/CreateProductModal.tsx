@@ -54,7 +54,7 @@ export default function CreateProductModal({ onProductCreated }: CreateProductMo
     } else {
       toast.success('Товар успешно создан!');
       if (data) {
-        onProductCreated?.(data, parseInt(quantity, 10) || 1);
+        onProductCreated?.({ ...data, description: data.description ?? '', category: data.category ?? '', unit: data.unit ?? '' }, parseInt(quantity, 10) || 1);
       }
       setIsOpen(false);
       // Reset form

@@ -3,9 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import type {
-  PurchaseOrder,
-  PurchaseOrderDetails,
-  ReceiptData,
+  PurchaseOrder
 } from '@/lib/types';
 
 //==============================================================================
@@ -62,6 +60,7 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
 
 // Корректная типизация: возвращает WarehouseOrderItem[] из актуальной вьюхи warehouse_orders_view
 // TODO: Проверить соответствие структуры WarehouseOrderItem и warehouse_orders_view глобальному типу (fields: nomenclature_code, description: string, batch_number, expiry_date и др.)
+import type { WarehouseOrderItem } from '@/lib/types';
 export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
   const supabase = await createClient();
 
@@ -75,7 +74,33 @@ export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
     return [];
   }
 
-  return (data ?? []) as WarehouseOrderItem[];
+  // Явное преобразование и заполнение обязательных полей WarehouseOrderItem
+  return (data ?? []).map((item: any) => ({
+    purchase_order_id: item.purchase_order_id || '',
+    created_at: item.created_at || '',
+    shipped_at: item.shipped_at || null,
+    status: item.status || '',
+    customer_name: item.customer_name || '',
+    customer: item.customer || null,
+    order_item_id: item.order_item_id || '',
+    product: item.product || {
+      id: '',
+      title: '',
+      nomenclature_code: '',
+      description: '',
+      purchase_price: null,
+      selling_price: null,
+      category: '',
+      unit: '',
+      expiry_date: '',
+      batch_number: '',
+      created_at: '',
+      supplier_id: null
+    },
+    available_quantity: item.available_quantity ?? 0,
+    price_per_unit: item.price_per_unit ?? 0,
+    final_price: item.final_price ?? 0,
+  })) as WarehouseOrderItem[];
 }
 
 /**
@@ -118,12 +143,12 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
 /**
  * Fetches the full details for a single purchase order for the receiving page.
  */
-export async function getPurchaseOrderDetails(id: string): Promise<PurchaseOrderDetails | null> {
+export async function getPurchaseOrderDetails(id: string): Promise<PurchaseOrder | null> {
   const supabase = await createClient();
   // 1. Получить заказ
   const { data: order, error: orderError } = await supabase
     .from('purchase_orders')
-    .select(`id, expected_delivery_date, status, supplier:suppliers!inner(name)`)
+    .select(`id, expected_delivery_date, status, created_at, supplier_id, supplier:suppliers!inner(name)`)
     .eq('id', id)
     .single();
 
@@ -144,9 +169,21 @@ export async function getPurchaseOrderDetails(id: string): Promise<PurchaseOrder
   }
 
   return {
-    ...order,
-    purchase_order_items: items,
-  } as unknown as PurchaseOrderDetails;
+    id: order.id,
+    created_at: order.created_at ?? '',
+    expected_delivery_date: order.expected_delivery_date ?? null,
+    status: order.status,
+    supplier_id: order.supplier_id ?? '',
+    supplier: order.supplier ?? null,
+    purchase_order_items: (items ?? []).map((item: any) => ({
+      id: item.id,
+      purchase_order_id: order.id,
+      product_id: item.product_id,
+      quantity_ordered: item.quantity_ordered,
+      price_per_unit: item.price_per_unit ?? null,
+      product: item.product ?? null
+    }))
+  } as PurchaseOrder;
 }
 
 //==============================================================================
@@ -249,7 +286,8 @@ export async function insertCustomerOrderItemsWithBatch(
 /**
  * Processes a goods receipt by calling a PostgreSQL RPC function.
  */
-export async function processReceipt(receiptData: ReceiptData): Promise<{ success: boolean; message: string; }> {
+// import type { ReceiptData } from '@/lib/types';
+export async function processReceipt(receiptData: any): Promise<{ success: boolean; message: string; }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import SupplierList from '@/app/manager/SupplierList';
 import { getSuppliers } from '@/lib/actions/suppliers';
 
-interface SupplierInfo {
+interface Supplier {
   id: string;
   name: string;
   tin?: string;

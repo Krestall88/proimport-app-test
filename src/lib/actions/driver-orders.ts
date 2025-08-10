@@ -25,7 +25,9 @@ export async function getDriverOrders() {
     created_at: new Date(order.created_at).toLocaleString(),
     status: order.status,
     customer_name: order.customer?.name || '',
-    customer_phone: order.customer?.contacts?.phone || '',
+    customer_phone: (order.customer?.contacts && typeof order.customer.contacts === 'object' && 'phone' in order.customer.contacts)
+      ? (order.customer.contacts as any).phone || ''
+      : '',
     customer_address: order.customer?.delivery_address || '',
     items_count: order.items ? order.items.length : order.items_count || 0,
   }));

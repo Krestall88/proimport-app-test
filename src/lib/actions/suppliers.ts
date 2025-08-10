@@ -2,15 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 
-interface SupplierInfo {
-  id: string;
-  name: string;
-  tin?: string;
-  kpp?: string;
-  contacts?: { phone?: string; email?: string };
-  delivery_address?: string;
-  payment_terms?: string;
-}
+import { Supplier } from '@/lib/types';
 
 export async function createSupplier(formData: FormData) {
   const supabase = await createClient();
@@ -66,8 +58,8 @@ export async function deleteSupplier(id: string) {
   return { success: true, message: 'Поставщик успешно удалён' };
 }
 
-export async function getSuppliers(searchTerm?: string): Promise<SupplierInfo[]> {
-  const supabase = createClient();
+export async function getSuppliers(searchTerm?: string): Promise<Supplier[]> {
+  const supabase = await createClient();
   let query = supabase
     .from('suppliers')
     .select('id, name, contacts, tin, kpp, delivery_address, payment_terms')
@@ -87,10 +79,14 @@ export async function getSuppliers(searchTerm?: string): Promise<SupplierInfo[]>
   return (data || []).map((supplier: any) => ({
     id: supplier.id,
     name: supplier.name,
-    contacts: supplier.contacts || { phone: undefined, email: undefined },
-    tin: supplier.tin || undefined,
-    kpp: supplier.kpp || undefined,
-    delivery_address: supplier.delivery_address || undefined,
-    payment_terms: supplier.payment_terms || undefined,
+    tin: supplier.tin ?? null,
+    kpp: supplier.kpp ?? null,
+    delivery_address: supplier.delivery_address ?? null,
+    payment_terms: supplier.payment_terms ?? null,
+    contacts: {
+      phone: supplier.contacts?.phone ?? null,
+      email: supplier.contacts?.email ?? null,
+    },
+    comments: supplier.comments ?? null,
   }));
 }

@@ -36,7 +36,7 @@ const InventoryPage = async function InventoryPage() {
 
   if (error) {
     console.error('Error fetching inventory:', error);
-    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы 'products' и 'inventory' созданы.</p>;
+    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы &apos;products&apos; и &apos;inventory&apos; созданы.</p>;
   }
 
 

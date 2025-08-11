@@ -123,7 +123,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
               <th className="p-2 border">Статус</th>
               <th className="p-2 border">Товар</th>
               <th className="p-2 border">Описание</th>
-              <th className="p-2 border">Номенклатурный код</th>
+              <th className="p-2 border">Артикул</th>
               <th className="p-2 border">Партия</th>
               <th className="p-2 border">Срок годности</th>
               <th className="p-2 border">Кол-во</th>
@@ -140,11 +140,11 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
               <tr><td colSpan={15} className="text-center p-4">Нет заказов для отображения.</td></tr>
             ) : (
               orders.map((item) => (
-                <tr key={item.purchase_order_id} className="border-b align-top" data-state={selectedRows.includes(item.purchase_order_id) ? 'selected' : ''}>
+                <tr key={item.order_item_id} className="border-b align-top" data-state={selectedRows.includes(item.order_item_id) ? 'selected' : ''}>
                   <td className="p-2 border">
                     <Checkbox 
-                      checked={selectedRows.includes(item.purchase_order_id)}
-                      onCheckedChange={() => handleSelectRow(item.purchase_order_id)}
+                      checked={selectedRows.includes(item.order_item_id)}
+                      onCheckedChange={() => handleSelectRow(item.order_item_id)}
                     />
                   </td>
                   <td className="p-2 border font-medium">{item.customer_name}</td>
@@ -161,11 +161,11 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                       {statusMap[item.status] || item.status}
                     </span>
                   </td>
-                  <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
-                  <td className="p-2 border">{item.product?.description ?? '-'}</td>
-                  <td className="p-2 border">{item.product?.nomenclature_code ?? '-'}</td>
+                  <td className="p-2 border">{item.product?.title ?? 'Название не найдено'}</td>
+                  <td className="p-2 border">{item.product?.description ?? 'без описания'}</td>
+                  <td className="p-2 border">{item.product?.nomenclature_code ?? 'Артикул не найден'}</td>
                   <td className="p-2 border">{item.product?.batch_number ?? '-'}</td>
-                  <td className="p-2 border">{new Date(item.product.expiry_date || '').toLocaleDateString()}</td>
+                  <td className="p-2 border">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString() : '—'}</td>
                   <td className="p-2 border">{item.available_quantity} {item.product?.unit ?? ''}</td>
                   <td className="p-2 border">{formatCurrency(item.purchase_price)}</td>
                   <td className="p-2 border">{formatCurrency(item.final_price)}</td>
@@ -174,7 +174,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteRow(item.purchase_order_id)}
+                      onClick={() => handleDeleteRow(item.order_item_id)}
                       className="text-red-600 hover:text-red-800"
                     >
                       <Trash2 className="w-4 h-4" />

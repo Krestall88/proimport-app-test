@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getCustomerOrdersForManager } from '@/lib/actions/manager';
 
 // Импортируем все компоненты панелей управления
 import OwnerDashboard from '@/components/dashboards/OwnerDashboard';
@@ -23,6 +24,26 @@ export default async function Home() {
     .eq('id', user.id)
     .single();
 
+  // Загружаем данные для панелей, которым они нужны
+  if (profile?.role === 'warehouse_manager' || profile?.role === 'driver') {
+    const allOrders = await getCustomerOrdersForManager();
+    
+    const [{ count: receivingCount }, { count: inventoryCount }] = await Promise.all([
+      supabase.from('purchase_orders').select('id', { count: 'exact', head: true }).in('status', ['ordered', 'in_transit']),
+      supabase.from('inventory').select('id', { count: 'exact', head: true }),
+    ] as const);
+
+    if (profile.role === 'warehouse_manager') {
+      const warehouseOrders = allOrders.filter(o => ['new', 'picking', 'ready_for_shipment'].includes(o.status));
+      return <WarehouseManagerDashboard orders={warehouseOrders} receivingCount={receivingCount ?? 0} inventoryCount={inventoryCount ?? 0} />;
+    }
+
+    if (profile.role === 'driver') {
+      const driverOrders = allOrders.filter(o => o.status === 'shipped');
+      return <DriverDashboard shippedOrders={driverOrders} />;
+    }
+  }
+
   // В зависимости от роли пользователя отображаем соответствующую панель
   switch (profile?.role) {
     case 'owner':
@@ -31,10 +52,6 @@ export default async function Home() {
       return <AgentDashboard />;
     case 'accountant':
       return <AccountantDashboard />;
-    case 'warehouse_manager':
-      return <WarehouseManagerDashboard />;
-    case 'driver':
-      return <DriverDashboard />;
     default:
       // Запасной вариант для пользователей без роли или с неизвестной ролью
       return (

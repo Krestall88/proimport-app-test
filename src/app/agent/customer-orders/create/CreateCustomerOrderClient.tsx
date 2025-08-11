@@ -111,61 +111,51 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
       toast.error("Количество должно быть больше нуля");
       return;
     }
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.product.product_id === product.product_id);
+
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.product.product_id === product.product_id);
       if (existingItem) {
-        return prevCart.map(item =>
-          item.product.product_id === product.product_id
-            ? { ...item, qty: item.qty + quantity }
-            : item
+        return prevCart.map((item) =>
+          item.product.product_id === product.product_id ? { ...item, qty: item.qty + quantity } : item
         );
       } else {
-        const productForCart = { ...product };
-        return [...prevCart, { product: productForCart, qty: quantity }];
+        return [...prevCart, { product, qty: quantity }];
       }
     });
   };
 
   const handleRemoveFromCart = (productId: string) => {
-    setCart(cart.filter(item => item.product.product_id !== productId));
+    setCart((prev) => prev.filter((item) => item.product.product_id !== productId));
   };
 
   const handleUpdateCartQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       handleRemoveFromCart(productId);
     } else {
-      setCart(cart.map(item => item.product.product_id === productId ? { ...item, qty: newQuantity } : item));
+      setCart((prev) => prev.map((item) => (item.product.product_id === productId ? { ...item, qty: newQuantity } : item)));
     }
   };
 
-  const handleCreateOrder = async () => {
+  const handleCreateOrder = () => {
     if (!selectedCustomerId) {
-      toast.error("Пожалуйста, выберите клиента");
+      toast.error("Пожалуйста, выберите клиента.");
       return;
     }
-
     if (cart.length === 0) {
-      toast.error("Корзина не может быть пустой");
+      toast.error("Корзина пуста.");
       return;
     }
 
     startTransition(async () => {
       try {
-        // DEBUG: Проверим, что передается в cart
-        console.log('DEBUG: Sending cart to server action:', cart);
-        
-        // Проверяем, что все элементы корзины имеют корректную цену
-        const validatedCart = cart.map(item => ({
-          product_id: item.product.product_id,
-          qty: item.qty,
-          final_price: (item.product.final_price !== undefined && !isNaN(item.product.final_price)) ? item.product.final_price : 0,
-        }));
-        
-        console.log('DEBUG: Validated cart:', validatedCart);
-        
         const result = await createCustomerOrders({
           customerId: selectedCustomerId,
-          cart: validatedCart,
+          cart: cart.map(item => ({
+            product_id: item.product.product_id,
+            qty: item.qty,
+            final_price: item.product.final_price,
+            product_name: item.product.title,
+          })),
           wishlist: wishlist,
         });
 
@@ -216,40 +206,39 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
           </Select>
         </div>
       </div>
-      <div className="mb-6">
-        <div className="w-full">
-          <h2 className="text-xl font-semibold mb-4">Остатки товаров</h2>
-          <div className="mb-4">
-            <Input
-              placeholder="Поиск товаров..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
-          </div>
+
+      {/* Остатки и корзина */}
+      <div className="grid grid-cols-1 gap-8">
+        {/* Левая колонка: Остатки */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Доступные товары</h2>
+          <Input
+            placeholder="Поиск по названию или артикулу..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mb-4 max-w-sm"
+          />
           <div className="border rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[200px]">Наименование</TableHead>
-                  <TableHead className="w-[250px]">Описание</TableHead>
                   <TableHead>Артикул</TableHead>
-                  <TableHead>Партия</TableHead>
-                  <TableHead>Срок годности</TableHead>
-                  <TableHead className="text-right">Цена, сом</TableHead>
+                  <TableHead>Наименование</TableHead>
+                  <TableHead>Описание</TableHead>
+                  <TableHead>Номер партии</TableHead>
+                  <TableHead className="text-right">Цена</TableHead>
                   <TableHead className="text-right">Остаток</TableHead>
-                  <TableHead className="text-center">Кол-во</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead>Количество</TableHead>
+                  <TableHead className="text-right">Действия</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {displayInventory.map((product) => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="font-medium">{product.title}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{product.description}</TableCell>
                     <TableCell>{product.nomenclature_code}</TableCell>
-                    <TableCell>{product.batch_number || '-'}</TableCell>
-                    <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell className="font-medium">{product.title}</TableCell>
+                    <TableCell>{product.description}</TableCell>
+                    <TableCell>{product.batch_number}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>
                     <TableCell className="text-right">{product.available_quantity} {product.unit}</TableCell>
                     <TableCell className="min-w-[120px]">
@@ -293,7 +282,9 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Артикул</TableHead>
                   <TableHead>Наименование</TableHead>
+                  <TableHead>Описание</TableHead>
                   <TableHead className="text-right">Количество</TableHead>
                   <TableHead className="text-right">Цена</TableHead>
                   <TableHead className="text-right">Итого</TableHead>
@@ -303,7 +294,9 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
               <TableBody>
                 {cart.map((item) => (
                   <TableRow key={item.product.product_id}>
-                    <TableCell className="font-medium">{item.product.title || item.product.title}</TableCell>
+                    <TableCell>{item.product.nomenclature_code}</TableCell>
+                    <TableCell className="font-medium">{item.product.title}</TableCell>
+                    <TableCell>{item.product.description}</TableCell>
                     <TableCell className="text-right">{item.qty} {item.product.unit}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.product.final_price)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.product.final_price * item.qty)}</TableCell>

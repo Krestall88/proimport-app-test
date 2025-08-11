@@ -82,8 +82,7 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
     return [];
   }
 
-  // View уже возвращает плоский массив позиций заказов
-  // Явное преобразование и заполнение обязательных полей
+  // View возвращает плоский массив, поэтому мы вручную собираем объект product
   return (data ?? []).map((item: any) => ({
     purchase_order_id: item.purchase_order_id || '',
     created_at: item.created_at || '',
@@ -91,21 +90,21 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
     status: item.status || '',
     customer_name: item.customer_name || '',
     order_item_id: item.order_item_id || '',
-    product: item.product || {
-      id: '',
-      title: '',
-      nomenclature_code: '',
-      description: '',
-      purchase_price: null,
-      selling_price: null,
-      category: '',
-      unit: '',
-      expiry_date: '',
-      batch_number: '',
-      created_at: '',
-      supplier_id: null
+    product: {
+      id: item.product_id || '',
+      title: item.product_title || 'Название не указано',
+      nomenclature_code: item.sku || 'Артикул не указан',
+      description: item.description || '',
+      purchase_price: item.purchase_price ?? null,
+      selling_price: item.final_price ?? null,
+      category: item.category || '',
+      unit: item.unit || '',
+      expiry_date: item.expiry_date || '',
+      batch_number: item.batch_number || '',
+      created_at: item.product_created_at || '',
+      supplier_id: item.supplier_id || null,
     },
-    available_quantity: item.available_quantity ?? 0,
+    available_quantity: item.quantity ?? 0, // В view это поле называется quantity
     purchase_price: item.purchase_price ?? 0,
     final_price: item.final_price ?? 0,
     item_total: item.item_total ?? 0,

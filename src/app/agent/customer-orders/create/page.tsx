@@ -26,11 +26,15 @@ export default async function CreateCustomerOrderPage() {
     );
   }
 
-  // The data from RPC is already in the correct shape.
+  // The data from RPC needs a slight adjustment to match the InventoryProduct shape.
   const inventory: InventoryProduct[] = (inventoryData as any[]).map(item => ({
-  ...item,
-  unit: item.unit ?? undefined,
-}));
+    ...item,
+    title: item.product_name, // Map product_name from RPC to title
+    description: item.description ?? '',
+    unit: item.unit ?? undefined,
+    batch_number: item.batch_number ?? '',
+    final_price: item.final_price ?? 0,
+  }));
 
   return (
     <div className="container mx-auto p-4">

@@ -18,7 +18,7 @@ export function OrderExpandableRow({ order, onConfirmPicking }: { order: Warehou
         <TableCell style={{ width: 32 }}>
           <OrderRowExpandIcon expanded={expanded} />
         </TableCell>
-        <TableCell className="font-medium">{order.order_item_id?.substring(0, 8) ?? ''}</TableCell>
+        <TableCell className="font-medium">{(order.order_item_id ? String(order.order_item_id) : '').substring(0, 8) || <span style={{color: 'red'}}>нет ID</span>}</TableCell>
         <TableCell>{order.customer_name ?? order.customer?.name ?? ''}</TableCell>
         <TableCell>{order.created_at ? new Date(order.created_at).toLocaleDateString() : ''}</TableCell>
         <TableCell>{order.status ?? ''}</TableCell>

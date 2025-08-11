@@ -2,15 +2,15 @@
 
 export interface InventoryProduct {
   product_id: string;
-  title: string; // вместо name
-  nomenclature_code: string;
-  available_quantity: number;
-  expiry_date: string;
-  description: string; // теперь всегда строка, даже если поле пустое
-  batch_number: string;
-  unit: string;
-  final_price: number;
-  category: string;
+  title: string; // Наименование
+  description: string; // Описание
+  category: string; // Категория
+  unit: string; // Единица измерения
+  nomenclature_code: string; // Артикул
+  batch_number: string; // Номер партии
+  expiry_date?: string; // Срок годности
+  available_quantity: number; // Доступное количество
+  final_price: number; // Цена
 }
 
 // Универсальный тип для wishlist/cart, всегда содержит qty и comment

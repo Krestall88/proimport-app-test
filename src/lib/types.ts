@@ -213,8 +213,8 @@ export interface WarehouseOrderItem {
     payment_terms?: string;
   } | null;
   order_item_id: string;
-  product: Product; // Используем единый тип Product с расширенным набором полей
-  available_quantity: number;
+  product: Product | null;
+  quantity: number;
   price_per_unit?: number;
   final_price?: number;
 }

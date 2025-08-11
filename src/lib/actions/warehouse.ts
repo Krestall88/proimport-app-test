@@ -76,30 +76,32 @@ export async function getCustomerOrders(): Promise<WarehouseOrderItem[]> {
 
   // Явное преобразование и заполнение обязательных полей WarehouseOrderItem
   return (data ?? []).map((item: any) => ({
-    purchase_order_id: item.purchase_order_id || '',
+    purchase_order_id: item.purchase_order_id || item.order_id || '', // Use purchase_order_id, fallback to order_id
     created_at: item.created_at || '',
     shipped_at: item.shipped_at || null,
     status: item.status || '',
     customer_name: item.customer_name || '',
-    customer: item.customer || null,
+    customer: null, // The view does not provide full customer object
     order_item_id: item.order_item_id || '',
-    product: item.product || {
-      id: '',
-      title: '',
-      nomenclature_code: '',
-      description: '',
-      purchase_price: null,
-      selling_price: null,
-      category: '',
-      unit: '',
-      expiry_date: '',
-      batch_number: '',
-      created_at: '',
-      supplier_id: null
-    },
-    available_quantity: item.available_quantity ?? 0,
+    quantity: item.quantity ?? 0, // Correct top-level field
     price_per_unit: item.price_per_unit ?? 0,
     final_price: item.final_price ?? 0,
+    product: {
+      id: item.product_id || '', // The view does not provide product_id
+      title: item.product_name || 'Название не указано', // Correct field from view
+      nomenclature_code: item.sku || 'Артикул не указан', // Correct field from view
+      description: item.description || '',
+      category: item.category || '',
+      unit: item.unit || '',
+      expiry_date: item.expiry_date || null,
+      batch_number: item.batch_number || '',
+      // These fields are not in the view, so we set them to default values
+      purchase_price: null,
+      selling_price: null, 
+      created_at: '',
+      supplier_id: null,
+      available_quantity: item.quantity ?? 0, // available_quantity is part of product
+    },
   })) as WarehouseOrderItem[];
 }
 
@@ -129,7 +131,7 @@ export async function getInventory(): Promise<BatchInventoryItem[]> {
       expiry_date: item.expiry_date,
       unit: item.unit,
       category: item.category,
-      description: item.product?.description,
+      description: item.description ?? '', // FIX: Access description directly
     },
     available_quantity: item.available_quantity,
     purchase_price: item.purchase_price,

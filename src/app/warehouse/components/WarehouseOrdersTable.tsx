@@ -57,10 +57,10 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
   };
 
   const grouped = orders.reduce((acc, item) => {
-    acc[item.purchase_order_id] = acc[item.purchase_order_id] || { ...item, items: [] };
-    acc[item.purchase_order_id].items.push(item);
-    return acc;
-  }, {} as Record<string, WarehouseOrderItem & { items: WarehouseOrderItem[] }>);
+  acc[item.purchase_order_id] = acc[item.purchase_order_id] || { ...item, items: [] };
+  acc[item.purchase_order_id].items.push(item);
+  return acc;
+}, {} as Record<string, WarehouseOrderItem & { items: WarehouseOrderItem[] }>);
   // Сортировка: новые статусы всегда сверху, внутри групп — по дате (новые сверху)
   const statusPriority = (status: string) => {
     switch (status) {
@@ -110,7 +110,7 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                   <td className="p-3 border-r text-center">
                     {expandedRows.has(order.purchase_order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </td>
-                  <td className="p-3 border-r font-mono">{order.purchase_order_id.substring(0, 8)}</td>
+                  <td className="p-3 border-r font-mono">{order.purchase_order_id ? String(order.purchase_order_id).substring(0, 8) : 'нет ID'}</td>
                   <td className="p-3 border-r">
                     <div>
                       <div>{order.customer_name}</div>
@@ -155,10 +155,10 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                         <table className="min-w-full bg-background/50 text-sm rounded-md">
                           <thead className="bg-muted/40">
                             <tr>
+                              <th className="p-2 border text-left">Артикул</th>
                               <th className="p-2 border text-left">Товар</th>
                               <th className="p-2 border text-left">Описание</th>
                               <th className="p-2 border text-left">Категория</th>
-                              <th className="p-2 border text-left">Артикул</th>
                               <th className="p-2 border text-left">Срок годн.</th>
                               <th className="p-2 border text-left">Партия</th>
                               <th className="p-2 border text-center">Кол-во</th>
@@ -168,18 +168,13 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                           <tbody>
                             {order.items.map(item => (
                               <tr key={item.order_item_id} className="border-t">
-                                <td className="p-2 border-r">{item.product.title ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product.description ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product.category ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product.nomenclature_code ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
-                                <td className="p-2 border-r">{item.product.batch_number ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
+                                <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.description ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.category ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
                                 <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>
-                                <td className="p-2 border-r text-center font-bold">{item.available_quantity}</td>
+                                <td className="p-2 border-r text-center font-bold">{item.quantity}</td>
                                 <td className="p-2 text-center">{item.product?.unit ?? '-'}</td>
                               </tr>
                             ))}

@@ -216,7 +216,6 @@ export interface WarehouseOrderItem {
   product: Product | null;
   quantity: number;
   price_per_unit?: number;
-  final_price?: number;
 }
 
 export interface ManagerGoodsReceipt {

@@ -69,7 +69,11 @@ export function OrderExpandableRow({ order, onConfirmPicking }: { order: Warehou
                   <TableCell>{order.quantity ?? ''}</TableCell>
                   <TableCell>{order.product?.unit ?? ''}</TableCell>
                   <TableCell>{order.price_per_unit ?? ''}</TableCell>
-                  <TableCell>{(order.price_per_unit * order.quantity).toFixed(2)}</TableCell>
+                  <TableCell>
+                    {typeof order.price_per_unit === 'number' && typeof order.quantity === 'number'
+                      ? (order.price_per_unit * order.quantity).toFixed(2)
+                      : '-'}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

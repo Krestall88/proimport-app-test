@@ -24,6 +24,12 @@ const statusMap: Record<string, string> = {
 };
 
 export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrdersTableProps) {
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Неверная дата' : date.toLocaleString('ru-RU');
+  };
+
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
   const [dialogState, setDialogState] = useState({ isOpen: false, orderId: '' });
@@ -113,7 +119,7 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                   <td className="p-3 border-r font-mono">{order.purchase_order_id ? String(order.purchase_order_id).substring(0, 8) : 'нет ID'}</td>
                   <td className="p-3 border-r">
                     <div>
-                      <div>{order.customer_name}</div>
+                                            <div>{order.customer_name || 'Нет имени'}</div>
                       <div className="text-xs text-gray-500">
                         {order.customer?.contacts?.phone && <div>Тел: {order.customer.contacts.phone}</div>}
                         {order.customer?.contacts?.email && <div>Email: {order.customer.contacts.email}</div>}
@@ -124,7 +130,7 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 border-r whitespace-nowrap">{new Date(order.created_at).toLocaleString("ru-RU")}</td>
+                  <td className="p-3 border-r whitespace-nowrap">{formatDate(order.created_at)}</td>
                   <td className="p-3 border-r whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${order.status === 'new' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}`}>
                       {statusMap[order.status] || order.status}
@@ -172,7 +178,7 @@ export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrder
                                 <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.description ?? '-'}</td>
                                 <td className="p-2 border-r">{item.product?.category ?? '-'}</td>
-                                <td className="p-2 border-r">{item.product?.expiry_date ? new Date(item.product.expiry_date).toLocaleDateString("ru-RU") : '-'}</td>
+                                                                <td className="p-2 border-r">{formatDate(item.product?.expiry_date)}</td>
                                 <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>
                                 <td className="p-2 border-r text-center font-bold">{item.quantity}</td>
                                 <td className="p-2 text-center">{item.product?.unit ?? '-'}</td>

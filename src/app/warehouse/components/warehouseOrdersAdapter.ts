@@ -12,8 +12,7 @@ export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseO
       customer: item.customer || null,
       order_item_id: typeof item.order_item_id === 'string' ? item.order_item_id : String(item.order_item_id || ''),
       quantity: item.quantity, // This is the quantity in the order
-      price_per_unit: item.price_per_unit ?? item.final_price ?? 0,
-      final_price: item.final_price ?? 0,
+      price_per_unit: item.price_per_unit ?? 0,
       product: {
         id: item.product_id || item.sku || '',
         title: item.product_name || '', // Use product_name from the view
@@ -28,7 +27,7 @@ export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseO
         created_at: item.product_created_at || '',
         supplier_id: item.supplier_id ?? null,
         characteristics: item.characteristics,
-        available_quantity: item.available_quantity ?? item.quantity ?? 0
+        quantity: item.quantity ?? 0
       },
     }));
   }
@@ -47,9 +46,8 @@ export function mapCustomerOrdersToWarehouseOrders(rawOrders: any[]): WarehouseO
           customer,
           order_item_id: typeof item.id === 'string' ? item.id : (item.id ? String(item.id) : ''),
           product: item.product ?? null,
-          available_quantity: item.available_quantity ?? 0,
-          price_per_unit: item.price_per_unit ?? undefined,
-          final_price: item.final_price ?? undefined
+          quantity: item.quantity ?? 0,
+          price_per_unit: item.price_per_unit ?? undefined
         });
       }
     }

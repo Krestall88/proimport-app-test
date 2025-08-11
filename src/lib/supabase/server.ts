@@ -1,23 +1,9 @@
-// src/lib/supabase/server.ts
-// src/lib/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { Database } from '../database.types';
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { Database } from '../database.types'
 
-// Универсальный SSR Supabase client: работает и в app-directory (через next/headers), и в pages/server actions (через параметр)
-export async function createClient(customCookies?: any) {
-  let cookies;
-  let isCustom = false;
-  try {
-    // В app-directory и server components (Next.js 15+) используем асинхронный API
-    cookies = (await import('next/headers')).cookies;
-    if (typeof cookies === 'function') {
-      cookies = await cookies(); // cookies() теперь асинхронный
-    }
-  } catch {
-    // В pages-directory или при ошибке — используем переданные cookies
-    cookies = customCookies;
-    isCustom = true;
-  }
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,23 +11,29 @@ export async function createClient(customCookies?: any) {
     {
       cookies: {
         get(name: string) {
-          return cookies?.get(name)?.value;
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          // set разрешён только если явно переданы customCookies (Server Action/Route Handler)
-          if (isCustom && cookies?.set) {
-            cookies.set({ name, value, ...options });
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
           }
         },
         remove(name: string, options: CookieOptions) {
-          // remove разрешён только если явно переданы customCookies
-          if (isCustom && cookies?.set) {
-            cookies.set({ name, value: '', ...options });
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
           }
         },
       },
     }
-  );
+  )
 }
 
 

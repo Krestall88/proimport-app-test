@@ -19,7 +19,7 @@ export async function getManagerCustomerOrders() {
         quantity,
         price_per_unit,
         product:products(id, nomenclature_code, title, description),
-        inventory_items!inner(
+        inventory!inner(
           goods_receipt_items!inner(purchase_price)
         )
       ),
@@ -38,7 +38,7 @@ export async function getManagerCustomerOrders() {
     id: string;
     quantity: number;
     price_per_unit: number | null;
-    inventory_items: {
+    inventory: {
       goods_receipt_items: {
         purchase_price: number | null;
       }[];
@@ -51,7 +51,7 @@ export async function getManagerCustomerOrders() {
       id: item.id,
       quantity: item.quantity,
       price_per_unit: item.price_per_unit,
-      purchase_price: item.inventory_items[0]?.goods_receipt_items[0]?.purchase_price || 0,
+      purchase_price: item.inventory[0]?.goods_receipt_items[0]?.purchase_price || 0,
       product: item.product
         ? {
             id: item.product.id,

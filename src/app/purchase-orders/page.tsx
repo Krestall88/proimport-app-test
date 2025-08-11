@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
+import { Database } from '@/lib/database.types';
+import { PurchaseOrder } from '@/lib/types';
 import PurchaseOrdersTable from './PurchaseOrdersTable';
 
 export default async function PurchaseOrdersPage() {
@@ -9,15 +11,17 @@ export default async function PurchaseOrdersPage() {
     .from('purchase_orders')
     .select(`
       id,
+      created_at,
       expected_delivery_date,
       status,
-      supplier ( name ),
+      supplier_id,
+      supplier:suppliers(*),
       purchase_order_items (
         id,
         purchase_order_id,
         product_id,
         quantity_ordered,
-        product:products ( id, title, purchase_price )
+        product:products(*)
       )
     `)
     .order('created_at', { ascending: false });
@@ -27,33 +31,28 @@ export default async function PurchaseOrdersPage() {
     return <p>Не удалось загрузить закупочные заказы. Ошибка: {error.message}</p>;
   }
 
-  // Преобразуем expected_delivery_date к string, если оно null
-  const safeOrders = (orders || []).map(order => ({
-    ...order,
-    expected_delivery_date: order.expected_delivery_date || '',
-    // TODO: FIXED BY AI - временно закомментировано из-за рассинхрона типов supplier
-    // supplier: order.supplier && typeof order.supplier.name === 'string' ? order.supplier : { name: '' },
-    // TODO: FIXED BY AI - supplier заглушка для прохождения типов
-    supplier: { id: '', name: '', contacts: { phone: null, email: null } },
+  const safeOrders = (orders || []).map(order => {
+    let supplierContacts: { phone?: string | null; email?: string | null; } | null = null;
 
-    created_at: '', // TODO: FIXED BY AI - временно пусто для прохождения типов
-    supplier_id: '', // TODO: FIXED BY AI - временно пусто для прохождения типов
-    purchase_order_items: (order.purchase_order_items || []).map((item: any) => ({
-      ...item,
-      product: {
-        id: item.product?.id || '',
-        title: item.product?.title || '',
-        nomenclature_code: '', // TODO: заглушка nomenclature_code
-        description: '', // TODO: заглушка description
-        purchase_price: item.product?.purchase_price ?? null,
-        selling_price: null, // TODO: заглушка selling_price
-        category: '', // TODO: заглушка category
-        unit: '', // TODO: заглушка unit
-        supplier_id: '', // TODO: заглушка supplier_id
-        created_at: '', // TODO: заглушка created_at
+    if (typeof order.supplier?.contacts === 'string') {
+      try {
+        supplierContacts = JSON.parse(order.supplier.contacts);
+      } catch (e) {
+        supplierContacts = null; // В случае ошибки парсинга
       }
-    }))
-  }));
+    } else if (typeof order.supplier?.contacts === 'object' && order.supplier?.contacts !== null) {
+      supplierContacts = order.supplier.contacts as any;
+    }
+
+    return {
+      ...order,
+      supplier: order.supplier ? {
+        ...order.supplier,
+        contacts: supplierContacts,
+      } : null,
+      purchase_order_items: order.purchase_order_items || [],
+    };
+  }) as PurchaseOrder[];
 
   return (
     <div className="space-y-6">

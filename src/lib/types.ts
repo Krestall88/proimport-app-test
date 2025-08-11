@@ -46,7 +46,7 @@ export interface Supplier {
   contacts: {
     phone?: string | null;
     email?: string | null;
-  };
+  } | null;
   comments?: string | null;
 }
 

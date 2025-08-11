@@ -196,9 +196,13 @@ export async function getPurchaseOrdersForManager(): Promise<PurchaseOrder[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('manager_orders_view') // Используем существующую view вместо несуществующей
-    .select('*')
-    .eq('status', 'pending')
+    .from('purchase_orders')
+    .select(`
+      *,
+      supplier:suppliers(*),
+      purchase_order_items:purchase_order_items(*, product:products(*))
+    `)
+    .in('status', ['pending', 'partially_received'])
     .order('expected_delivery_date', { ascending: true });
 
   if (error) {
@@ -206,16 +210,7 @@ export async function getPurchaseOrdersForManager(): Promise<PurchaseOrder[]> {
     return [];
   }
 
-  // Явное преобразование к PurchaseOrder[]
-  return (data ?? []).map((item: any) => ({
-    id: item.id || '',
-    created_at: item.created_at || '',
-    expected_delivery_date: item.expected_delivery_date || null,
-    status: item.status || '',
-    supplier_id: item.supplier_id || '',
-    supplier: item.supplier || null,
-    purchase_order_items: item.purchase_order_items || [],
-  })) as PurchaseOrder[];
+  return data as PurchaseOrder[];
 }
 
 // --- Analytics Actions ---

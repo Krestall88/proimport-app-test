@@ -29,14 +29,14 @@ const InventoryPage = async function InventoryPage() {
       purchase_price,
       expiration_date,
       storage_place,
-      inventory:inventory_items (quantity, last_updated_at)
+      inventory (quantity, last_updated_at)
     `)
     .order('name')
     .returns<any[]>();
 
   if (error) {
     console.error('Error fetching inventory:', error);
-    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы &apos;products&apos; и &apos;inventory_items&apos; созданы.</p>;
+    return <p>Не удалось загрузить данные инвентаря. Убедитесь, что таблицы 'products' и 'inventory' созданы.</p>;
   }
 
 

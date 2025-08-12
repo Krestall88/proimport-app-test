@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
-import { forceDeleteOrderItem, forceDeleteOrderItems } from './actions';
+// import { forceDeleteOrderItem, forceDeleteOrderItems } from './actions'; // TODO: Re-enable when RPC functions are fixed
 import { toast } from 'sonner';
 
 import type { ManagerOrderItem } from '@/lib/types';
@@ -48,40 +48,11 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
   };
 
   const handleDeleteSelected = () => {
-    setDialogContent({
-      title: 'Подтвердите удаление',
-      description: `Вы уверены, что хотите удалить ${selectedRows.length} выбранных позиций? Это действие необратимо.`
-    });
-    setActionToConfirm(() => () => {
-      startTransition(async () => {
-        const result = await forceDeleteOrderItems(selectedRows);
-        if (result.success) {
-          toast.success(result.message); 
-          setSelectedRows([]);
-        } else {
-          toast.error(result.message);
-        }
-      });
-    });
-    setDialogOpen(true);
+    toast.info('Функция принудительного удаления временно отключена.');
   };
 
   const handleDeleteRow = (id: string) => {
-    setDialogContent({
-      title: 'Подтвердите удаление',
-      description: 'Вы уверены, что хотите удалить эту позицию? Это действие необратимо.'
-    });
-    setActionToConfirm(() => () => {
-      startTransition(async () => {
-        const result = await forceDeleteOrderItem(id);
-        if (result.success) {
-          toast.success(result.message);
-        } else {
-          toast.error(result.message);
-        }
-      });
-    });
-    setDialogOpen(true);
+    toast.info('Функция принудительного удаления временно отключена.');
   };
 
   return (

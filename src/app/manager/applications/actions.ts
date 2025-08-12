@@ -14,3 +14,4 @@ export async function deleteApplication(applicationId: string) {
 
   return { success: true, message: 'Заявка успешно удалена.' };
 }
+

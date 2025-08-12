@@ -13,8 +13,8 @@ export interface InventoryProduct {
   final_price: number; // Цена
 }
 
-// Универсальный тип для wishlist/cart, всегда содержит qty и comment
-export interface WishlistItem extends InventoryProduct {
+// Универсальный тип для заявки/корзины, всегда содержит qty и comment
+export interface ApplicationItem extends InventoryProduct {
   qty: number;
   comment?: string;
   // Для совместимости с продуктами, где используется product_name

@@ -80,7 +80,7 @@ const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryPro
           <label className="block text-sm">Комментарий</label>
           <Input name="comment" value={form.comment} onChange={handleChange} placeholder="Комментарий" disabled={disabled} />
         </div>
-        <Button type="button" onClick={handleAdd} className="h-10" disabled={disabled}>Добавить в хотелки</Button>
+        <Button type="button" onClick={handleAdd} className="h-10" disabled={disabled}>Добавить в доп. заказ</Button>
       </div>
       {wishlist.length > 0 && (
         <Table>

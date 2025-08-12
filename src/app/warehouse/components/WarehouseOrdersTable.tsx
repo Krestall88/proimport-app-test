@@ -1,5 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createClient } from '@/lib/supabase/client';
+import { Database } from '@/lib/database.types';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import ConfirmPickButton from './ConfirmPickButton';
 import { deleteCustomerOrders } from '@/lib/actions/warehouse';
@@ -23,8 +25,50 @@ const statusMap: Record<string, string> = {
   delivered: "Доставлен",
 };
 
-export default function WarehouseOrdersTable({ orders, loading }: WarehouseOrdersTableProps) {
-  const formatDate = (dateString?: string | null) => {
+export default function WarehouseOrdersTable({ orders: initialOrders, loading }: WarehouseOrdersTableProps) {
+  const [orders, setOrders] = useState(initialOrders);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel('realtime-orders')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'customer_orders' },
+        (payload) => {
+          console.log('Change received!', payload);
+
+          if (payload.eventType === 'UPDATE') {
+            const updatedOrder = payload.new as Database['public']['Tables']['customer_orders']['Row'];
+            setOrders(currentOrders =>
+              currentOrders.map(order =>
+                order.purchase_order_id === updatedOrder.id
+                  ? { ...order, status: updatedOrder.status, shipment_date: updatedOrder.shipment_date }
+                  : order
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            const deletedOrder = payload.old as { id?: string };
+            if (deletedOrder.id) {
+              setOrders(currentOrders =>
+                currentOrders.filter(item => item.purchase_order_id !== deletedOrder.id)
+              );
+            }
+          }
+          // INSERT events will be handled by a full page refetch for data consistency
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+    const formatDate = (dateString?: string | null) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? 'Неверная дата' : date.toLocaleString('ru-RU');

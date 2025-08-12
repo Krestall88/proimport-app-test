@@ -33,7 +33,7 @@ export default function PurchaseOrderCreation() {
   const [isCreating, setIsCreating] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
-  // Автоматическая загрузка позиций из localStorage (wishlist)
+
   // Подписка на изменения managerPurchaseOrderCart (корзины руководителя)
   useEffect(() => {
     const syncCart = () => {
@@ -127,6 +127,21 @@ export default function PurchaseOrderCreation() {
     toast.success(`${safeProduct.title} добавлен в корзину`);
   };
 
+  const handleCartQuantityChange = (productId: string, newQuantity: number) => {
+    if (newQuantity < 1) {
+      toast.info('Количество не может быть меньше 1. Для удаления используйте кнопку.');
+      return;
+    }
+
+    setCart(prevCart => {
+      const updatedCart = prevCart.map(item =>
+        item.product.id === productId ? { ...item, qty: newQuantity } : item
+      );
+      localStorage.setItem('managerPurchaseOrderCart', JSON.stringify(updatedCart));
+      return updatedCart;
+    });
+  };
+
   const removeFromCart = (productId: string) => {
     setCart(prev => {
       const updated = prev.filter(item => item.product.id !== productId);
@@ -159,7 +174,7 @@ export default function PurchaseOrderCreation() {
         setCart([]);
         setQuantities({});
         setSelectedSupplier(null);
-        // После успешного создания заказа очищаем корзину wishlist и корзину руководителя
+        // После успешного создания заказа очищаем корзину руководителя
         localStorage.removeItem('purchaseOrderCart');
         localStorage.removeItem('managerPurchaseOrderCart');
       }
@@ -244,7 +259,15 @@ export default function PurchaseOrderCreation() {
     <TableCell>{freshProduct.unit || '-'}</TableCell>
   </>;
 })()}
-                          <TableCell>{qty}</TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={qty}
+                              onChange={(e) => handleCartQuantityChange(item.product.id, parseInt(e.target.value, 10) || 0)}
+                              className="w-24"
+                              min="1"
+                            />
+                          </TableCell>
                           <TableCell>{price || '-'}</TableCell>
                           <TableCell>{sum ? sum.toLocaleString() : '-'}</TableCell>
                           <TableCell className="text-right">

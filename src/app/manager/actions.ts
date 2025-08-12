@@ -1,6 +1,8 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+'use server';
+
+import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function deleteOrderItems(orderItemIds: string[]) {
@@ -35,6 +37,40 @@ export async function deleteOrderItem(orderItemId: string) {
 
   revalidatePath('/manager');
   return { success: true, message: 'Позиция успешно удалена.' };
+}
+
+export async function forceDeleteOrderItem(orderItemId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('force_delete_order_item', {
+    p_order_item_id: orderItemId
+  });
+
+  if (error) {
+    console.error('Error force deleting order item:', error);
+    return { success: false, message: 'Ошибка при принудительном удалении позиции заказа.' };
+  }
+
+  revalidatePath('/manager/orders');
+  revalidatePath('/manager');
+  return { success: true, message: 'Позиция принудительно удалена.' };
+}
+
+export async function forceDeleteOrderItems(orderItemIds: string[]) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('force_delete_order_items', {
+    p_order_item_ids: orderItemIds
+  });
+
+  if (error) {
+    console.error('Error force deleting order items:', error);
+    return { success: false, message: 'Ошибка при принудительном удалении позиций заказа.' };
+  }
+
+  revalidatePath('/manager/orders');
+  revalidatePath('/manager');
+  return { success: true, message: 'Выбранные позиции принудительно удалены.' };
 }
 
 // Defines the unique key for a group of inventory items as seen in the manager view.

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProductFromWishlist } from '@/app/manager/create-purchase-order/actions';
+import { createProductFromApplication } from '@/app/manager/create-purchase-order/actions';
 
 export async function POST(request: NextRequest) {
   try {
     const fields = await request.json();
-    const result = await createProductFromWishlist(fields);
+    const result = await createProductFromApplication(fields);
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

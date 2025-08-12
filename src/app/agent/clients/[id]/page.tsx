@@ -35,7 +35,6 @@ const AgentClientDetailPage = async function (props: any) {
 
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Детали клиента</h1>
       <AgentClientDetail client={client} canEdit={canEdit} />
     </div>
   );

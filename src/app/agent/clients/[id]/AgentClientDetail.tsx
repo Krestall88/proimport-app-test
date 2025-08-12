@@ -6,6 +6,7 @@ import { Customer } from '@/lib/types';
 import { updateClient, deleteClient } from '@/app/agent/clients/actions';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { ArrowLeft } from 'lucide-react';
 
 interface AgentClientDetailProps {
   client: Customer;
@@ -74,14 +75,16 @@ export default function AgentClientDetail({ client, canEdit }: AgentClientDetail
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Детали клиента</h1>
-        <button
-          onClick={() => router.push('/agent/clients')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          ← Вернуться к списку клиентов
-        </button>
-        <h1 className="text-2xl font-bold">{isEditing ? 'Редактирование клиента' : 'Карточка клиента'}</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/agent/clients')}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors text-sm"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Назад</span>
+          </button>
+          <h1 className="text-2xl font-bold">{isEditing ? 'Редактирование клиента' : 'Карточка клиента'}</h1>
+        </div>
         <div className="flex space-x-2">
           {canEdit && !isEditing && (
             <>

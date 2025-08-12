@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
-import { deleteOrderItem, deleteOrderItems } from './actions';
+import { forceDeleteOrderItem, forceDeleteOrderItems } from './actions';
 import { toast } from 'sonner';
 
 import type { ManagerOrderItem } from '@/lib/types';
@@ -54,7 +54,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
     });
     setActionToConfirm(() => () => {
       startTransition(async () => {
-        const result = await deleteOrderItems(selectedRows);
+        const result = await forceDeleteOrderItems(selectedRows);
         if (result.success) {
           toast.success(result.message); 
           setSelectedRows([]);
@@ -73,7 +73,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
     });
     setActionToConfirm(() => () => {
       startTransition(async () => {
-        const result = await deleteOrderItem(id);
+        const result = await forceDeleteOrderItem(id);
         if (result.success) {
           toast.success(result.message);
         } else {
@@ -149,7 +149,7 @@ export default function ManagerOrdersTable({ orders, loading }: ManagerOrdersTab
                   </td>
                   <td className="p-2 border font-medium">{item.customer_name}</td>
                   <td className="p-2 border">{new Date(item.created_at).toLocaleDateString()}</td>
-                  <td className="p-2 border">{item.shipped_at ? new Date(item.shipped_at).toLocaleDateString() : '—'}</td>
+                  <td className="p-2 border">{item.shipment_date ? new Date(item.shipment_date).toLocaleDateString() : '—'}</td>
                   <td className="p-2 border">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       item.status === 'new' || item.status === 'pending' 

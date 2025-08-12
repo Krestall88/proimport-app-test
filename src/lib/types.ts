@@ -150,6 +150,7 @@ export interface AgentOrderItem {
   purchase_order_id: string;
   created_at: string;
   status: string;
+  shipment_date?: string | null;
   customer_name: string;
   customer_contacts?: {
     phone?: string | null;
@@ -184,7 +185,7 @@ export interface ManagerInventoryItem {
 export interface ManagerOrderItem {
   purchase_order_id: string;
   created_at: string;
-  shipped_at?: string | null;
+  shipment_date?: string | null;
   status: string;
   customer_name: string;
   order_item_id: string;
@@ -193,6 +194,7 @@ export interface ManagerOrderItem {
   purchase_price: number;
   final_price: number;
   item_total: number;
+  shipped_at?: string | null;
 }
 
 export interface WarehouseOrderItem {

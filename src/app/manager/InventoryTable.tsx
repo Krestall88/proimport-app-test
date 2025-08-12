@@ -54,7 +54,7 @@ export default function InventoryTable({ inventory, loading }: InventoryTablePro
       const groupsToDelete: InventoryGroupKey[] = recordIds.map(id => {
         const item = inventory.find(invItem => invItem.id === id);
         return {
-          productId: item!.product.title,
+          productId: item!.product.id,
           batchNumber: item!.product.batch_number ?? null,
           expiryDate: item!.product.expiry_date ?? null,
         };

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 import { AppShell } from '@/components/shell';
-import { User, Users, ShoppingCart } from 'lucide-react';
+import { User, Users, ShoppingCart, PlusCircle, Heart, FileText } from 'lucide-react';
 
 export default async function AgentLayout({ children }: { children: React.ReactNode }) {
 
@@ -30,9 +30,8 @@ export default async function AgentLayout({ children }: { children: React.ReactN
     { href: '/agent', label: 'Дашборд', icon: <User className="h-5 w-5" /> },
     { href: '/agent/clients', label: 'Клиенты', icon: <Users className="h-5 w-5" /> },
     { href: '/agent/customer-orders', label: 'Заказы', icon: <ShoppingCart className="h-5 w-5" /> },
-    { href: '/agent/customer-orders/create', label: 'Создать заказ', icon: <ShoppingCart className="h-5 w-5" /> },
-    { href: '/agent/wishlist', label: 'Хотелки', icon: <ShoppingCart className="h-5 w-5" /> },
-  ];
+    { href: '/agent/customer-orders/create', label: 'Создать заказ', icon: <PlusCircle className="h-5 w-5" /> },
+      ];
 
   return (
     <AppShell

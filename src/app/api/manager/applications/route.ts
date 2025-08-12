@@ -5,19 +5,22 @@ export async function GET() {
   const supabase = await createClient();
   // Только для роли manager: можно добавить проверку auth
   const { data, error } = await supabase
-    .from("customer_wishlist")
+    .from("customer_applications")
     .select(`
       id, 
       customer_id, 
       agent_id, 
-      wishlist_items, 
+      application_items, 
       created_at, 
       updated_at,
-      customer:customers(name),
-      agent:profiles(full_name)
+      customer:customers!inner(name, contacts, tin, kpp, delivery_address, payment_terms),
+      agent:profiles!inner(full_name)
     `);
+
   if (error) {
-    return NextResponse.json([], { status: 500 });
+    console.error('Error fetching applications:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data);
+
+  return NextResponse.json(data || []);
 }

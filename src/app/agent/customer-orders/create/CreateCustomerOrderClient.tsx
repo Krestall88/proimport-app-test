@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2 } from "lucide-react";
 import WishlistSection from "./WishlistSection";
-import type { WishlistItem } from "@/lib/types/inventory";
+import type { ApplicationItem as WishlistItem } from "@/lib/types/inventory";
 
 import type { InventoryProduct } from "@/lib/types/inventory";
 
@@ -129,11 +129,26 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
   };
 
   const handleUpdateCartQuantity = (productId: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemoveFromCart(productId);
-    } else {
-      setCart((prev) => prev.map((item) => (item.product.product_id === productId ? { ...item, qty: newQuantity } : item)));
+    const productInInventory = inventory.find(p => p.product_id === productId);
+    if (!productInInventory) return;
+
+    if (newQuantity < 1) {
+      toast.info("Количество не может быть меньше 1. Для удаления используйте кнопку.");
+      // Не меняем значение, если оно некорректно
+      return; 
     }
+
+    if (newQuantity > productInInventory.available_quantity) {
+      toast.error(`Недостаточно остатков. Доступно: ${productInInventory.available_quantity}`);
+      // Устанавливаем максимально доступное значение
+      newQuantity = productInInventory.available_quantity;
+    }
+
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.product_id === productId ? { ...item, qty: newQuantity } : item
+      )
+    );
   };
 
   const handleCreateOrder = () => {
@@ -241,17 +256,22 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
                     <TableCell>{product.batch_number}</TableCell>
                     <TableCell className="text-right">{formatCurrency(product.final_price)}</TableCell>
                     <TableCell className="text-right">{product.available_quantity} {product.unit}</TableCell>
-                    <TableCell className="min-w-[120px]">
-                      <Input
-                        type="number"
-                        min="1"
-                        max={product.available_quantity}
-                        value={qtyById[product.product_id] || 1}
-                        onChange={(e) => setQtyById({ ...qtyById, [product.product_id]: parseInt(e.target.value, 10) })}
-                        className="w-32"
-                        style={{ minWidth: 120 }}
-                        disabled={product.available_quantity <= 0}
-                      />
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Input
+                          type="number"
+                          value={qtyById[product.product_id] || 1}
+                          onChange={(e) =>
+                            setQtyById({
+                              ...qtyById,
+                              [product.product_id]: parseInt(e.target.value, 10),
+                            })
+                          }
+                          className="w-28 text-right"
+                          min="1"
+                          max={product.available_quantity}
+                        />
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -297,7 +317,18 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
                     <TableCell>{item.product.nomenclature_code}</TableCell>
                     <TableCell className="font-medium">{item.product.title}</TableCell>
                     <TableCell>{item.product.description}</TableCell>
-                    <TableCell className="text-right">{item.qty} {item.product.unit}</TableCell>
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Input
+                          type="number"
+                          value={item.qty}
+                          onChange={(e) => handleUpdateCartQuantity(item.product.product_id, parseInt(e.target.value, 10) || 0)}
+                          className="w-28 text-right"
+                          min="1"
+                          max={inventory.find(p => p.product_id === item.product.product_id)?.available_quantity ?? item.qty}
+                        />
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right">{formatCurrency(item.product.final_price)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(item.product.final_price * item.qty)}</TableCell>
                     <TableCell className="text-center">
@@ -333,6 +364,7 @@ export default function CreateCustomerOrderClient({ inventory }: CreateCustomerO
         <WishlistSection
           disabled={!selectedCustomerId}
           onWishlistChange={setWishlist}
+          
           inventory={inventory}
         />
       </div>

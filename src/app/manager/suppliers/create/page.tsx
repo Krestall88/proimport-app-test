@@ -2,6 +2,9 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { createSupplier } from '@/lib/actions/suppliers';
 import { toast } from 'sonner';
 
@@ -43,7 +46,15 @@ export default function CreateSupplierPage() {
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
-      <h1 className="text-2xl font-bold mb-6">Добавить поставщика</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Добавить поставщика</h1>
+        <Button asChild variant="outline">
+          <Link href="/manager/suppliers">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Назад к списку
+          </Link>
+        </Button>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4 bg-gray-800 p-6 rounded-lg shadow">
         <div>
           <label htmlFor="name" className="block mb-2 text-sm font-medium">Название</label>

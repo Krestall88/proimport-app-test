@@ -143,7 +143,7 @@ export default async function AgentDashboard() {
                       <td className="p-4">{order.customer_name || 'N/A'}</td>
                       <td className="p-4"><StatusBadge status={order.status} /></td>
                       <td className="p-4">
-                        <Link href={`/agent/customer-orders/${order.purchase_order_id}`} className="text-blue-400 hover:underline">Детали</Link>
+                        <Link href={`/agent/customer-orders`} className="text-blue-400 hover:underline">Детали</Link>
                       </td>
                     </tr>
                   ))}

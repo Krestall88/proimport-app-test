@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 import type { Supplier } from '@/lib/types';
+import { ArrowLeft } from 'lucide-react';
 
 interface SupplierDetailProps {
   supplier: Supplier;
@@ -80,7 +81,16 @@ export default function SupplierDetail({ supplier, canEdit }: SupplierDetailProp
       />
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{isEditing ? 'Редактирование поставщика' : 'Карточка поставщика'}</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/manager/suppliers')}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors text-sm"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Назад</span>
+          </button>
+          <h1 className="text-2xl font-bold">{isEditing ? 'Редактирование поставщика' : 'Карточка поставщика'}</h1>
+        </div>
         <div className="flex space-x-2">
           {canEdit && !isEditing && (
             <>

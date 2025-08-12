@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-interface WishlistItem {
+interface ApplicationItem {
   name: string;
   qty: number;
   unit?: string;
@@ -19,9 +19,9 @@ interface WishlistItem {
   comment?: string;
 }
 
-export interface WishlistToCartDialogProps {
+export interface ApplicationToCartDialogProps {
   trigger: React.ReactNode;
-  initial: WishlistItem;
+  initial: ApplicationItem;
   onSubmit: (item: RequiredProductFields) => void;
 }
 
@@ -35,7 +35,7 @@ export interface RequiredProductFields {
   purchase_price: number;
 }
 
-export function WishlistToCartDialog({ trigger, initial, onSubmit }: WishlistToCartDialogProps) {
+export function ApplicationToCartDialog({ trigger, initial, onSubmit }: ApplicationToCartDialogProps) {
   const [fields, setFields] = useState<RequiredProductFields>({
     nomenclature_code: '',
     title: initial.name || '',

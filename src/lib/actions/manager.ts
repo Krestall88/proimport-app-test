@@ -75,17 +75,35 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
 
   query = query.order('created_at', { ascending: false });
 
-  const { data, error } = await query;
+  const { data: viewData, error: viewError } = await query;
 
-  if (error) {
-    console.error('Error fetching customer orders:', error);
+  if (viewError) {
+    console.error('Error fetching customer orders from view:', viewError);
     return [];
   }
 
-  // View возвращает плоский массив, поэтому мы вручную собираем объект product
-  return (data ?? []).map((item: any) => ({
+  if (!viewData) {
+    return [];
+  }
+
+  const purchaseOrderIds = [...new Set(viewData.map(item => item.purchase_order_id).filter(Boolean))];
+
+  const { data: ordersData, error: ordersError } = await supabase
+    .from('customer_orders')
+    .select('purchase_order_id, shipment_date')
+    .in('purchase_order_id', purchaseOrderIds);
+
+  if (ordersError) {
+    console.error('Error fetching shipment dates:', ordersError);
+    // Продолжаем без дат, чтобы страница не падала
+  }
+
+  const shipmentDateMap = new Map(ordersData?.map(o => [o.purchase_order_id, o.shipment_date]));
+
+  return (viewData ?? []).map((item: any) => ({
     purchase_order_id: item.purchase_order_id || '',
     created_at: item.created_at || '',
+    shipment_date: shipmentDateMap.get(item.purchase_order_id) || null,
     shipped_at: item.shipped_at || null,
     status: item.status || '',
     customer_name: item.customer_name || '',
@@ -104,7 +122,7 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
       created_at: item.product_created_at || '',
       supplier_id: item.supplier_id || null,
     },
-    available_quantity: item.quantity ?? 0, // В view это поле называется quantity
+    available_quantity: item.quantity ?? 0,
     purchase_price: item.purchase_price ?? 0,
     final_price: item.final_price ?? 0,
     item_total: item.item_total ?? 0,

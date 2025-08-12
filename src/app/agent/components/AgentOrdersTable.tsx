@@ -39,6 +39,12 @@ const formatNumber = (amount: number | null | undefined) => {
   return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 };
 
+const formatDate = (dateString?: string | null) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? 'Неверная дата' : date.toLocaleDateString('ru-RU');
+};
+
 export default function AgentOrdersTable({ orders, loading }: AgentOrdersTableProps) {
   const [isPending, startTransition] = useTransition();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -118,76 +124,80 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
   };
 
   return (
-    <div>
+    <div className="container mx-auto p-4 bg-gray-900 text-gray-200 rounded-lg">
       <ConfirmationDialog
         isOpen={dialogOpen}
         onOpenChange={setDialogOpen}
         onConfirm={() => {
-          if (actionToConfirm) actionToConfirm();
+          actionToConfirm?.();
           setDialogOpen(false);
         }}
         title={dialogContent.title}
         description={dialogContent.description}
+        isPending={isPending}
       />
-      <div className="mb-4 flex items-center gap-4">
-        <Button
-          onClick={() => handleDeleteEntireOrder(groupedOrders[0].purchase_order_id)}
-          disabled={selectedRows.length === 0 || isPending}
-          variant="destructive"
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Удалить выбранное ({selectedRows.length})
-        </Button>
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold">Заказы клиентов</h1>
       </div>
-      <div className="overflow-auto max-h-[80vh] border rounded-lg bg-background shadow-md">
+      <div className="overflow-auto max-h-[80vh] border border-gray-700 rounded-lg bg-gray-900 shadow-md">
         <table className="min-w-full table-auto border-collapse">
-          <thead className="bg-muted sticky top-0 z-10">
+          <thead className="bg-gray-800 sticky top-0 z-10">
             <tr>
-              <th className="p-3 border-b text-left w-12"></th>
-              <th className="p-3 border-b text-left">ID заказа</th>
-              <th className="p-3 border-b text-left">Клиент</th>
-              <th className="p-3 border-b text-left">Дата создания</th>
-              <th className="p-3 border-b text-left">Статус</th>
-              <th className="p-3 border-b text-center">Товаров</th>
-              <th className="p-3 border-b text-right">Сумма заказа</th>
+              <th className="p-3 border-b border-gray-700 text-left w-12"></th>
+              <th className="p-3 border-b border-gray-700 text-left">ID заказа</th>
+              <th className="p-3 border-b border-gray-700 text-left">Статус</th>
+              <th className="p-3 border-b border-gray-700 text-left">Дата отгрузки</th>
+              <th className="p-3 border-b border-gray-700 text-left">Клиент</th>
+              <th className="p-3 border-b border-gray-700 text-left">Дата создания</th>
+              <th className="p-3 border-b border-gray-700 text-right">Сумма</th>
+              <th className="p-3 border-b border-gray-700 text-center">Действия</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className="text-center p-6">Загрузка...</td></tr>
+              <tr><td colSpan={8} className="text-center p-6">Загрузка...</td></tr>
             ) : groupedOrders.length === 0 ? (
-              <tr><td colSpan={7} className="text-center p-6">Нет заказов для отображения.</td></tr>
+              <tr><td colSpan={8} className="text-center p-6">Нет заказов для отображения.</td></tr>
             ) : (
               groupedOrders.map((order: GroupedOrder) => (
                 <React.Fragment key={order.purchase_order_id}>
-                  <tr className="border-b align-top hover:bg-muted/50" data-state={selectedRows.some(id => order.items.some(item => item.order_item_id === id)) ? 'selected' : ''}>
-                    <td className="p-3 border-r text-center cursor-pointer" onClick={() => toggleRow(order.purchase_order_id)}>
+                  <tr className="border-b border-gray-700 hover:bg-gray-800/50" data-state={selectedRows.includes(order.purchase_order_id) ? 'selected' : ''}>
+                    <td className="p-3 border-r border-gray-700 cursor-pointer" onClick={() => toggleRow(order.purchase_order_id)}>
                       {expandedRows.has(order.purchase_order_id) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                     </td>
-                    <td className="p-3 border-r font-mono whitespace-nowrap">{order.purchase_order_id.substring(0, 8)}</td>
-                    <td className="p-3 border-r whitespace-nowrap">{order.customer_name}</td>
-                    <td className="p-3 border-r whitespace-nowrap">{new Date(order.created_at).toLocaleString("ru-RU")}</td>
-                    <td className="p-3 border-r whitespace-nowrap">
+                    <td className="p-3 border-r border-gray-700 font-mono whitespace-nowrap">{order.purchase_order_id.substring(0, 8)}</td>
+                    <td className="p-3 border-r border-gray-700 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${order.status === 'new' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}`}>
                         {statusMap[order.status] || order.status}
                       </span>
                     </td>
-                    <td className="p-3 border-r text-center">{order.items.length}</td>
-                    <td className="p-3 text-right font-bold whitespace-nowrap">{formatCurrency(order.total_sum)}</td>
+                    <td className="p-3 border-r border-gray-700 whitespace-nowrap">{formatDate(order.shipment_date)}</td>
+                    <td className="p-3 border-r border-gray-700 whitespace-nowrap">{order.customer_name}</td>
+                    <td className="p-3 border-r border-gray-700 whitespace-nowrap">{new Date(order.created_at).toLocaleDateString('ru-RU')}</td>
+                    <td className="p-3 border-r border-gray-700 text-right font-bold">{formatCurrency(order.total_sum)}</td>
+                    <td className="p-3 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteEntireOrder(order.purchase_order_id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
                   </tr>
                   {expandedRows.has(order.purchase_order_id) && (
-                    <tr className="bg-muted/20">
-                      <td colSpan={7} className="p-0 border-b">
+                    <tr className="bg-gray-800/50">
+                      <td colSpan={8} className="p-0">
                         <div className="p-4">
-                          <h4 className="font-bold mb-2 text-lg">Состав заказа:</h4>
-                          <table className="min-w-full bg-background/50 text-sm rounded-md">
-                            <thead className="bg-muted/40">
+                          <table className="min-w-full table-auto border-collapse">
+                            <thead className="bg-gray-700/50">
                               <tr>
-                                <th className="p-2 border w-10">
+                                <th className="p-2 border border-gray-600 text-left w-12">
                                   <Checkbox
                                     onCheckedChange={(checked: CheckedState) => {
                                       const itemIds = order.items.map((i: AgentOrderItem) => i.order_item_id);
-                                      if (checked === true) {
+                                      if (checked) {
                                         setSelectedRows(prev => [...new Set([...prev, ...itemIds])]);
                                       } else {
                                         setSelectedRows(prev => prev.filter(id => !itemIds.includes(id)));
@@ -199,34 +209,34 @@ export default function AgentOrdersTable({ orders, loading }: AgentOrdersTablePr
                                     }
                                   />
                                 </th>
-                                <th className="p-2 border text-left">Артикул</th>
-                                <th className="p-2 border text-left">Товар</th>
-                                <th className="p-2 border text-left">Описание</th>
-                                <th className="p-2 border text-left">Партия</th>
-                                <th className="p-2 border text-left">Срок годности</th>
-                                <th className="p-2 border text-center">Кол-во</th>
-                                <th className="p-2 border text-right">Цена</th>
-                                <th className="p-2 border text-right">Итого</th>
-                                <th className="p-2 border text-center">Действия</th>
+                                <th className="p-2 border border-gray-600 text-left">Артикул</th>
+                                <th className="p-2 border border-gray-600 text-left">Товар</th>
+                                <th className="p-2 border border-gray-600 text-left">Описание</th>
+                                <th className="p-2 border border-gray-600 text-left">Партия</th>
+                                <th className="p-2 border border-gray-600 text-left">Срок годности</th>
+                                <th className="p-2 border border-gray-600 text-center">Кол-во</th>
+                                <th className="p-2 border border-gray-600 text-right">Цена</th>
+                                <th className="p-2 border border-gray-600 text-right">Итого</th>
+                                <th className="p-2 border border-gray-600 text-center">Действия</th>
                               </tr>
                             </thead>
                             <tbody>
                               {order.items.map((item: AgentOrderItem) => (
-                                <tr key={item.order_item_id} className="border-t" data-state={selectedRows.includes(item.order_item_id) ? 'selected' : ''}>
-                                  <td className="p-2 border-r">
+                                <tr key={item.order_item_id} className="border-t border-gray-700" data-state={selectedRows.includes(item.order_item_id) ? 'selected' : ''}>
+                                  <td className="p-2 border-r border-gray-600">
                                     <Checkbox
                                       onCheckedChange={() => handleSelectRow(item.order_item_id)}
                                       checked={selectedRows.includes(item.order_item_id)}
                                     />
                                   </td>
-                                  <td className="p-2 border-r">{item.product?.nomenclature_code ?? '-'}</td>
-                                  <td className="p-2 border-r">{item.product?.title ?? '-'}</td>
-                                  <td className="p-2 border-r text-xs text-gray-400">{item.product?.description ?? '-'}</td>
-                                  <td className="p-2 border-r">{item.product?.batch_number ?? '-'}</td>
-                                  <td className="p-2 border-r">{item.product?.expiry_date ?? '-'}</td>
-                                  <td className="p-2 border-r text-center font-bold">{item.available_quantity} {item.product?.unit ?? ''}</td>
-                                  <td className="p-2 border-r text-right">{formatCurrency(item.price_per_unit)}</td>
-                                  <td className="p-2 text-right font-bold">{formatCurrency((item.price_per_unit || 0) * item.available_quantity)}</td>
+                                  <td className="p-2 border-r border-gray-600">{item.product?.nomenclature_code ?? '-'}</td>
+                                  <td className="p-2 border-r border-gray-600">{item.product?.title ?? '-'}</td>
+                                  <td className="p-2 border-r border-gray-600 text-xs text-gray-400">{item.product?.description ?? '-'}</td>
+                                  <td className="p-2 border-r border-gray-600">{item.product?.batch_number ?? '-'}</td>
+                                  <td className="p-2 border-r border-gray-600">{item.product?.expiry_date ?? '-'}</td>
+                                  <td className="p-2 border-r border-gray-600 text-center font-bold">{item.available_quantity} {item.product?.unit ?? ''}</td>
+                                  <td className="p-2 border-r border-gray-600 text-right">{formatCurrency(item.price_per_unit)}</td>
+                                  <td className="p-2 border-r border-gray-600 text-right font-bold">{formatCurrency((item.price_per_unit || 0) * item.available_quantity)}</td>
                                   <td className="p-2 text-center">
                                     <Button
                                       variant="ghost"

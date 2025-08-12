@@ -8,6 +8,7 @@ interface DbOrder {
   order_id: string;
   created_at: string;
   status: string;
+  shipment_date?: string | null;
   customer_name: string;
   customer_contacts?: {
     phone?: string | null;
@@ -41,6 +42,7 @@ const mapCustomerOrdersToAgentItems = (dbOrders: DbOrder[]): AgentOrderItem[] =>
     purchase_order_id: item.order_id,
     created_at: item.created_at,
     status: item.status,
+    shipment_date: item.shipment_date,
     customer_name: item.customer_name,
     customer_contacts: item.customer_contacts,
     customer_tin: item.customer_tin,
@@ -79,11 +81,11 @@ export default async function CustomerOrdersPage() {
     return <p>Пожалуйста, войдите в систему.</p>;
   }
 
-  // Получаем заказы с корректной ценой из представления manager_customer_orders_view
+  // Получаем заказы с корректной ценой из представления manager_orders_view
   const { data: orders, error } = await supabase
-    .from('manager_customer_orders_view')
+    .from('manager_orders_view') // Используем то же представление, что и у менеджера
     .select('*')
-    .eq('agent_id', user.id)
+    .eq('agent_id', user.id) // Фильтруем по ID текущего агента
     .order('created_at', { ascending: false });
 
   if (error) {

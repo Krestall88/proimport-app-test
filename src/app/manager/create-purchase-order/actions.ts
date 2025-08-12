@@ -7,7 +7,7 @@ import type { Product } from '@/lib/types';
 
 import type { CartItem } from '@/lib/types'; // глобальный формат корзины
 
-export async function createProductFromWishlist(product: {
+export async function createProductFromApplication(product: {
   nomenclature_code: string;
   title: string;
   purchase_price?: number | null;

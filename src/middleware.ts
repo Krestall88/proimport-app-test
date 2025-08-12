@@ -41,42 +41,14 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  const homeRoutes: Record<string, string> = {
-    owner: '/manager',
-    agent: '/agent',
-    driver: '/driver',
-    warehouse: '/warehouse',
-  };
-
-  // If user is not logged in, redirect to /login, unless they are already there.
-  if (!user) {
-    if (pathname !== '/login') {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-    return response;
+  // If user is not logged in, redirect to /login for all pages except /login itself.
+  if (!user && pathname !== '/login') {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If user is logged in, handle redirects and route protection.
-  const role = user.user_metadata?.role as string;
-  const userHome = homeRoutes[role];
-
-  // Redirect from /login or / to the user's dashboard.
-  if (userHome && (pathname === '/login' || pathname === '/')) {
-    return NextResponse.redirect(new URL(userHome, request.url));
-  }
-
-  // Protect role-specific routes.
-  if (pathname.startsWith('/manager') && role !== 'owner') {
-    return NextResponse.redirect(new URL(userHome || '/login', request.url));
-  }
-  if (pathname.startsWith('/agent') && role !== 'agent') {
-    return NextResponse.redirect(new URL(userHome || '/login', request.url));
-  }
-  if (pathname.startsWith('/driver') && role !== 'driver') {
-    return NextResponse.redirect(new URL(userHome || '/login', request.url));
-  }
-  if (pathname.startsWith('/warehouse') && role !== 'warehouse') {
-    return NextResponse.redirect(new URL(userHome || '/login', request.url));
+  // If user is logged in, redirect from /login or root to /manager/analytics.
+  if (user && (pathname === '/login' || pathname === '/')) {
+    return NextResponse.redirect(new URL('/manager/analytics', request.url));
   }
 
   return response;
@@ -89,7 +61,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - auth (for Supabase auth callback)
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|auth).*)',
   ],
 };

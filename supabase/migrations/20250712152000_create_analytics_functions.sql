@@ -68,13 +68,13 @@ language sql
 as $$
   select
     co.customer_id,
-    c.name as customer_name,
+    p.full_name as customer_name,
     sum(coi.quantity * coi.price_per_unit) as total_spent
   from customer_orders co
   join customer_order_items coi on co.id = coi.customer_order_id
-  join customers c on c.id = co.customer_id
+  join profiles p on p.id = co.customer_id -- Join with profiles to get the name
   where co.status = 'shipped'
-  group by co.customer_id, c.name
+  group by co.customer_id, p.full_name
   order by total_spent desc
   limit 5;
 $$;

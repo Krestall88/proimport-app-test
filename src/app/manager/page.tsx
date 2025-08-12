@@ -1,43 +1,22 @@
-'use client';
+import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
+import ManagerClientPage from './ManagerClientPage';
+import type { Product } from '@/lib/types';
 
-import { useState, useEffect } from 'react';
-import ProductTable from '@/components/ProductTable';
-import CreateProductModal from '@/components/CreateProductModal';
-import { createClient } from '@/lib/supabase/client';
-import type { Database } from '@/lib/database.types';
-import { toast } from 'sonner';
+export default async function ManagerPage() {
+  const supabase = await createClient();
 
-import { Product } from '@/lib/types';
+  const { data: productsData, error } = await supabase.from('products').select('*');
 
-export default function ManagerProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  if (error) {
+    console.error('Error fetching products:', error);
+    return <div>Ошибка при загрузке данных. Пожалуйста, попробуйте позже.</div>;
+  }
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.from('products').select('*');
-      if (error) {
-        toast.error('Ошибка при загрузке товаров');
-      } else {
-        setProducts((data ?? []).map((p: any) => ({
-          ...p,
-          description: p.description ?? '',
-        })) as Product[]);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const initialProducts: Product[] = (productsData ?? []).map((p: any) => ({
+    ...p,
+    description: p.description ?? '',
+  }));
 
-  const handleProductCreated = (newProduct: Product) => {
-    setProducts(prev => [...prev, newProduct]);
-  };
-  return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        
-        <CreateProductModal onProductCreated={handleProductCreated} />
-      </div>
-      <ProductTable products={products} onProductsChange={setProducts} role="owner" />
-    </div>
-  );
+  return <ManagerClientPage initialProducts={initialProducts} />;
 }

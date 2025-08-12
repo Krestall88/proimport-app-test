@@ -26,9 +26,11 @@ export async function getDriverOrders() {
 
   // Унифицируем формат данных для таблицы
   return (data || [])
-    .filter(order => 
-      (order.items_count as unknown as { count: number }[] | null)?.[0]?.count > 0
-    )
+    .filter((order): order is NonNullable<typeof order> => {
+      if (!order) return false;
+      const itemsCount = order.items_count as unknown as { count: number }[] | null;
+      return (itemsCount?.[0]?.count ?? 0) > 0;
+    })
     .map(order => ({
       id: order.id,
       created_at: new Date(order.created_at).toLocaleString(),

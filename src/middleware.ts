@@ -25,36 +25,44 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const url = new URL(request.url);
+  const { pathname } = request.nextUrl;
 
-  // Если пользователь не залогинен и пытается зайти не на страницу логина
-  if (!user && url.pathname !== '/login') {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Если пользователь не аутентифицирован, разрешаем доступ только к странице входа
+  if (!user) {
+    if (pathname !== '/login') {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+    return response;
   }
 
-  // Если пользователь залогинен
-  if (user) {
-    const role = user.user_metadata?.role;
+  // Если пользователь аутентифицирован
+  const role = user.user_metadata?.role as string;
 
-    // Если залогиненный пользователь на странице логина, редиректим его
-    if (url.pathname === '/login') {
-      const redirectUrl = role === 'manager' ? '/manager' : role === 'agent' ? '/agent' : '/';
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
+  // Определяем домашнюю страницу для каждой роли
+  const homeRoutes: Record<string, string> = {
+    owner: '/manager',
+    agent: '/agent',
+    driver: '/driver',
+    warehouse: '/warehouse',
+  };
 
-    // Редирект с главной страницы в зависимости от роли
-    if (url.pathname === '/') {
-      const redirectUrl = role === 'manager' ? '/manager' : role === 'agent' ? '/agent' : '/';
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
+  const userHome = homeRoutes[role] || '/';
 
-    // Проверка доступа к роутам
-    if (url.pathname.startsWith('/manager') && role !== 'manager') {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-    if (url.pathname.startsWith('/agent') && role !== 'agent') {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+  // Если пользователь пытается получить доступ к странице входа, перенаправляем его на домашнюю страницу
+  if (pathname === '/login') {
+    return NextResponse.redirect(new URL(userHome, request.url));
+  }
+
+  // Если пользователь находится на главной странице, перенаправляем на его домашнюю страницу
+  if (pathname === '/' && userHome !== '/') {
+    return NextResponse.redirect(new URL(userHome, request.url));
+  }
+
+  // Проверяем, имеет ли пользователь доступ к запрашиваемому разделу
+  const protectedRoute = Object.values(homeRoutes).find(route => pathname.startsWith(route));
+  if (protectedRoute && userHome !== protectedRoute) {
+    // Если пользователь пытается получить доступ к чужому разделу, перенаправляем на его домашнюю страницу
+    return NextResponse.redirect(new URL(userHome, request.url));
   }
 
   return response;

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function deleteApplication(applicationId: string) {
   const supabase = await createClient();
   const { error } = await supabase
-    .from('customer_applications')
+    .from('customer_wishlist')
     .delete()
     .eq('id', applicationId);
 

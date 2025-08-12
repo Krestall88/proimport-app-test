@@ -62,7 +62,7 @@ export default function ManagerApplicationsPage() {
       try {
         // 1. Получаем все заявки
         const { data: applicationsData, error: applicationsError } = await supabase
-          .from('customer_applications')
+          .from('customer_wishlist')
           .select<`*`, ApplicationRow>('*');
 
         if (applicationsError) throw applicationsError;

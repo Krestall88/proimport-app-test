@@ -86,25 +86,10 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
     return [];
   }
 
-  const purchaseOrderIds = [...new Set(viewData.map(item => item.purchase_order_id).filter(Boolean))];
-
-  const { data: ordersData, error: ordersError } = await supabase
-    .from('customer_orders')
-    .select('purchase_order_id, shipment_date')
-    .in('purchase_order_id', purchaseOrderIds);
-
-  if (ordersError) {
-    console.error('Error fetching shipment dates:', ordersError);
-    // Продолжаем без дат, чтобы страница не падала
-  }
-
-  const shipmentDateMap = new Map(ordersData?.map(o => [o.purchase_order_id, o.shipment_date]));
-
   return (viewData ?? []).map((item: any) => ({
-    purchase_order_id: item.purchase_order_id || '',
+    purchase_order_id: item.id || '',
     created_at: item.created_at || '',
-    shipment_date: shipmentDateMap.get(item.purchase_order_id) || null,
-    shipped_at: item.shipped_at || null,
+    shipment_date: item.shipment_date || item.expected_delivery_date || null,
     status: item.status || '',
     customer_name: item.customer_name || '',
     order_item_id: item.order_item_id || '',
@@ -113,19 +98,20 @@ export async function getCustomerOrdersForManager(filters: ManagerOrdersFilters 
       title: item.product_title || 'Название не указано',
       nomenclature_code: item.sku || 'Артикул не указан',
       description: item.description || '',
-      purchase_price: item.purchase_price ?? null,
-      selling_price: item.final_price ?? null,
+      purchase_price: item.purchase_price || 0,
+      selling_price: item.final_price || 0, // Assuming final_price is selling_price
       category: item.category || '',
       unit: item.unit || '',
-      expiry_date: item.expiry_date || '',
+      expiry_date: item.expiry_date || null,
       batch_number: item.batch_number || '',
-      created_at: item.product_created_at || '',
-      supplier_id: item.supplier_id || null,
+      created_at: item.created_at || '', // Or product creation date if available
+      supplier_id: item.supplier_id || '',
     },
-    available_quantity: item.quantity ?? 0,
-    purchase_price: item.purchase_price ?? 0,
-    final_price: item.final_price ?? 0,
-    item_total: item.item_total ?? 0,
+    available_quantity: item.quantity || 0,
+    purchase_price: item.purchase_price || 0,
+    final_price: item.final_price || 0,
+    item_total: item.item_total || 0,
+    shipped_at: item.shipped_at || null,
   })) as ManagerOrderItem[];
 }
 

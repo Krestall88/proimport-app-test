@@ -3,18 +3,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
-import type { WishlistItem, InventoryProduct } from "@/lib/types/inventory";
+import type { ApplicationItem, InventoryProduct } from "@/lib/types/inventory";
 
 import { useEffect } from "react";
 
 interface WishlistSectionProps {
   disabled?: boolean;
-  onWishlistChange: (wishlist: WishlistItem[]) => void;
+  onWishlistChange: (wishlist: ApplicationItem[]) => void;
 }
 
 const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryProduct[] }> = ({ disabled, onWishlistChange, inventory }) => {
   const [form, setForm] = useState<{ title: string; qty: number; unit?: string; category?: string; comment?: string }>({ title: '', qty: 1, unit: '', category: '', comment: '' });
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [wishlist, setWishlist] = useState<ApplicationItem[]>([]);
 
   useEffect(() => {
     onWishlistChange(wishlist);
@@ -29,7 +29,7 @@ const WishlistSection: React.FC<WishlistSectionProps & { inventory: InventoryPro
     if (!form.title || !form.qty) return;
     // Найти товар в inventory по title
     const found = inventory.find(item => item.title === form.title);
-    let newItem: WishlistItem;
+    let newItem: ApplicationItem;
     if (found) {
       newItem = { ...found, qty: form.qty, comment: form.comment };
     } else {

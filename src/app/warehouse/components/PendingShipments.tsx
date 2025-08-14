@@ -12,6 +12,8 @@ import { Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { toast } from 'sonner';
 import { deletePurchaseOrder, deletePurchaseOrderItem } from '@/app/purchase-orders/actions';
+import * as XLSX from 'xlsx';
+import { format } from 'date-fns';
 
 interface PendingShipmentsProps {
   purchaseOrders: PurchaseOrder[];
@@ -25,6 +27,85 @@ export default function PendingShipments({ purchaseOrders }: PendingShipmentsPro
     itemId: '', 
     action: 'deleteOrder' as 'deleteOrder' | 'deleteItem' 
   });
+
+  const handleExport = (order: PurchaseOrder) => {
+    // 1. Информация о поставщике
+    const supplierInfo = [
+      ['Поставщик:', order.supplier?.name ?? ''],
+      ['Телефон:', order.supplier?.contacts?.phone ?? ''],
+      ['Email:', order.supplier?.contacts?.email ?? ''],
+      ['Адрес доставки:', order.supplier?.delivery_address ?? ''],
+      [], // Пустая строка для отступа
+      ['Номер заказа на поставку:', order.id],
+      ['Ожидаемая дата поставки:', order.expected_delivery_date ? format(new Date(order.expected_delivery_date), 'dd.MM.yyyy') : ''],
+      [], // Пустая строка для отступа
+    ];
+
+    // 2. Заголовки таблицы товаров
+    const itemHeaders = [
+      'Артикул',
+      'Название товара',
+      'Описание',
+      'Категория',
+      'Цена закупки',
+      'Количество',
+      'Единица измерения',
+      'Общая сумма закупки по позиции',
+    ];
+
+    // 3. Данные о товарах и расчет сумм
+    let totalOrderSum = 0;
+    const itemsData = order.purchase_order_items.map(item => {
+      const price = item.price_per_unit ?? 0;
+      const quantity = item.quantity_ordered;
+      const itemTotal = price * quantity;
+      totalOrderSum += itemTotal;
+      return [
+        item.product?.nomenclature_code ?? '',
+        item.product?.title ?? '',
+        item.product?.description ?? '',
+        item.product?.category ?? '',
+        price,
+        quantity,
+        item.product?.unit ?? '',
+        itemTotal,
+      ];
+    });
+
+    // 4. Строка с итоговой суммой
+    const totalRow = [
+      '', '', '', '', '', '', 'Общая сумма всего заказа:', totalOrderSum
+    ];
+
+    // 5. Сборка всех данных в один массив
+    const exportData = [
+      ...supplierInfo,
+      itemHeaders,
+      ...itemsData,
+      [], // Пустая строка
+      totalRow
+    ];
+
+    // 6. Создание листа Excel
+    const ws = XLSX.utils.aoa_to_sheet(exportData);
+
+    // 7. Настройка ширины колонок
+    ws['!cols'] = [
+      { wch: 20 }, // Артикул
+      { wch: 40 }, // Название товара
+      { wch: 50 }, // Описание
+      { wch: 25 }, // Категория
+      { wch: 15 }, // Цена закупки
+      { wch: 15 }, // Количество
+      { wch: 20 }, // Единица измерения
+      { wch: 30 }, // Общая сумма
+    ];
+
+    // 8. Создание книги и скачивание
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Заявка на поставку');
+    XLSX.writeFile(wb, `Заявка_на_поставку_${order.id}.xlsx`);
+  };
 
   const openDeleteOrderDialog = (orderId: string) => {
     setDialogState({ isOpen: true, orderId, itemId: '', action: 'deleteOrder' });
@@ -83,8 +164,8 @@ export default function PendingShipments({ purchaseOrders }: PendingShipmentsPro
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-muted-foreground mr-4">
-  Ожидается: {order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : '—'}
-</span>
+                      Ожидается: {order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : '—'}
+                    </span>
                     <Badge variant="outline">{order.status}</Badge>
                     <Button 
                       variant="ghost" 
@@ -98,6 +179,21 @@ export default function PendingShipments({ purchaseOrders }: PendingShipmentsPro
                       title="Удалить всю поставку"
                     >
                       <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExport(order);
+                      }}
+                      disabled={isPending}
+                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                      title="Сохранить в Excel"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
                     </Button>
                   </div>
                 </div>

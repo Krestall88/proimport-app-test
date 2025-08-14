@@ -23,12 +23,13 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
       id,
       expected_delivery_date,
       status,
-      supplier:suppliers!inner(name),
+      supplier:suppliers(name),
       purchase_order_items:purchase_order_items!inner(
         id,
         product_id,
         quantity_ordered,
-        product:products!inner(title, nomenclature_code, unit, description, category)
+        price_per_unit,
+        product:products(title, nomenclature_code, unit, description, category)
       )
     `)
     .eq('status', 'pending')
